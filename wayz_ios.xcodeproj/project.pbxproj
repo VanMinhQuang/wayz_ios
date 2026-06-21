@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FA42D26E2FE7F51F00897DFF /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = FA42D26D2FE7F51F00897DFF /* AsyncAlgorithms */; };
+		FA42D2702FE7F51F00897DFF /* AsyncStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = FA42D26F2FE7F51F00897DFF /* AsyncStreaming */; };
+		FA42D2712FE7F60000897DFF /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = FA42D2722FE7F60000897DFF /* Alamofire */; };
+		FA42D2732FE7F60000897DFF /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = FA42D2742FE7F60000897DFF /* Swinject */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		FA42D1E22FE7DE8800897DFF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +59,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA42D2702FE7F51F00897DFF /* AsyncStreaming in Frameworks */,
+				FA42D26E2FE7F51F00897DFF /* AsyncAlgorithms in Frameworks */,
+				FA42D2712FE7F60000897DFF /* Alamofire in Frameworks */,
+				FA42D2732FE7F60000897DFF /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +123,10 @@
 			);
 			name = wayz_ios;
 			packageProductDependencies = (
+				FA42D26D2FE7F51F00897DFF /* AsyncAlgorithms */,
+				FA42D26F2FE7F51F00897DFF /* AsyncStreaming */,
+				FA42D2722FE7F60000897DFF /* Alamofire */,
+				FA42D2742FE7F60000897DFF /* Swinject */,
 			);
 			productName = wayz_ios;
 			productReference = FA42D1D42FE7DE8700897DFF /* wayz_ios.app */;
@@ -195,6 +210,12 @@
 			);
 			mainGroup = FA42D1CB2FE7DE8600897DFF;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FA42D2692FE7F39000897DFF /* XCRemoteSwiftPackageReference "Alamofire" */,
+				FA42D26A2FE7F3A500897DFF /* XCRemoteSwiftPackageReference "Swinject" */,
+				FA42D26B2FE7F50000897DFF /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+				FA42D26C2FE7F51F00897DFF /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FA42D1D52FE7DE8700897DFF /* Products */;
 			projectDirPath = "";
@@ -570,6 +591,64 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FA42D2692FE7F39000897DFF /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.12.0;
+			};
+		};
+		FA42D26A2FE7F3A500897DFF /* XCRemoteSwiftPackageReference "Swinject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Swinject/Swinject.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.10.0;
+			};
+		};
+		FA42D26B2FE7F50000897DFF /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.1;
+			};
+		};
+		FA42D26C2FE7F51F00897DFF /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FA42D26D2FE7F51F00897DFF /* AsyncAlgorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA42D26C2FE7F51F00897DFF /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			productName = AsyncAlgorithms;
+		};
+		FA42D26F2FE7F51F00897DFF /* AsyncStreaming */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA42D26C2FE7F51F00897DFF /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			productName = AsyncStreaming;
+		};
+		FA42D2722FE7F60000897DFF /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA42D2692FE7F39000897DFF /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		FA42D2742FE7F60000897DFF /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA42D26A2FE7F3A500897DFF /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FA42D1CC2FE7DE8600897DFF /* Project object */;
 }
