@@ -9,11 +9,29 @@ struct AppNavigationStack: View {
     @Bindable var router: AppRouter
 
     var body: some View {
-        NavigationStack(path: $router.path) {
-            HomeView(viewModel: DIContainer.shared.resolve(HomeViewModel.self))
-                .navigationDestination(for: AppRoute.self) { route in
-                    destination(for: route)
+        ZStack {
+            if router.isLoggedIn {
+                MainTabView()
+                .transition(
+                    .asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal:   .move(edge: .leading).combined(with: .opacity)
+                    )
+                )
+            } else {
+                NavigationStack {
+                    LoginView(
+                        viewModel: DIContainer.shared.resolve(LoginViewModel.self),
+                        router: router
+                    )
                 }
+                .transition(
+                    .asymmetric(
+                        insertion: .move(edge: .leading).combined(with: .opacity),
+                        removal:   .move(edge: .trailing).combined(with: .opacity)
+                    )
+                )
+            }
         }
         .environment(router)
         .theme(.default)
@@ -22,8 +40,7 @@ struct AppNavigationStack: View {
     @ViewBuilder
     private func destination(for route: AppRoute) -> some View {
         switch route {
-        case .home:
-            HomeView(viewModel: DIContainer.shared.resolve(HomeViewModel.self))
+   
         case .profile(let userId):
             ProfileView(
                 viewModel: DIContainer.shared.resolve(ProfileViewModel.self),

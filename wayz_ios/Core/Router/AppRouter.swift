@@ -12,35 +12,53 @@ final class AppRouter {
     var path = NavigationPath()
     var isLoggedIn: Bool = false
 
+    // MARK: - Init
+
+    init() {
+        isLoggedIn = KeychainService.shared.accessToken != nil
+    }
+
     // MARK: - Navigation
 
     func push(_ route: AppRoute) {
-        path.append(route)
+        withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
+            path.append(route)
+        }
     }
 
     func pop() {
         guard !path.isEmpty else { return }
-        path.removeLast()
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+            path.removeLast()
+        }
     }
 
     func popToRoot() {
-        path.removeLast(path.count)
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            path.removeLast(path.count)
+        }
     }
 
     func replace(with route: AppRoute) {
-        path.removeLast(path.count)
-        path.append(route)
+        withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
+            path.removeLast(path.count)
+            path.append(route)
+        }
     }
 
     // MARK: - Auth state
 
     func logIn() {
-        isLoggedIn = true
-        popToRoot()
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
+            isLoggedIn = true
+            path.removeLast(path.count)
+        }
     }
 
     func logOut() {
-        isLoggedIn = false
-        KeychainService.shared.clearAll()
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+            isLoggedIn = false
+            KeychainService.shared.clearAll()
+        }
     }
 }

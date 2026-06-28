@@ -23,17 +23,13 @@ final class HomeViewModel {
     // MARK: - Intents
 
     @MainActor
-    func onAppear() async {
+    func loadUser(id: String) async {
         isLoading = true
         defer { isLoading = false }
         do {
-            user = try await getUserUseCase.execute(id: "me")
+            user = try await getUserUseCase.execute(id: id)
         } catch {
             errorMessage = error.localizedDescription
         }
-    }
-
-    func clearError() {
-        errorMessage = nil
     }
 }

@@ -22,7 +22,7 @@ enum APIRouter: URLRequestConvertible {
     // MARK: - Base URL
     private var baseURL: URL {
         // swiftlint:disable force_unwrapping
-        URL(string: AppEnvironment.current.baseURL)!
+        AppConfig.current.apiBaseURL
         // swiftlint:enable force_unwrapping
     }
 

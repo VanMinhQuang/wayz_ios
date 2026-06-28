@@ -13,6 +13,8 @@ final class LoginViewModel {
     var password: String = ""
     var isLoading: Bool = false
     var errorMessage: String?
+    var emailError: String?
+    var passwordError: String?
 
     // MARK: - Dependencies
     private let loginUseCase: LoginUseCase
@@ -26,10 +28,18 @@ final class LoginViewModel {
 
     @MainActor
     func login() async {
-        guard !email.isEmpty, !password.isEmpty else {
-            errorMessage = "Please enter your email and password."
-            return
+        emailError = nil
+        passwordError = nil
+        var hasError = false
+        if email.isEmpty {
+            emailError = "Email is required"
+            hasError = true
         }
+        if password.isEmpty {
+            passwordError = "Password is required"
+            hasError = true
+        }
+        guard !hasError else { return }
 
         isLoading = true
         defer { isLoading = false }

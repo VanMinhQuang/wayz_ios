@@ -13,10 +13,10 @@ final class APIClient {
 
     private let session: Session
 
-    private init() {
+    private init(config: AppConfig = .current) {
         let configuration = URLSessionConfiguration.af.default
-        configuration.timeoutIntervalForRequest = 30
-        configuration.timeoutIntervalForResource = 60
+        configuration.timeoutIntervalForRequest = config.apiTimeoutInterval
+        configuration.timeoutIntervalForResource = config.apiTimeoutInterval * 2
         session = Session(
             configuration: configuration,
             interceptor: AuthRequestInterceptor()

@@ -7,6 +7,7 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var viewModel: HomeViewModel
+    @Environment(\.appTheme) private var theme
     @Environment(AppRouter.self) private var router
 
     init(viewModel: HomeViewModel) {
@@ -16,27 +17,62 @@ struct HomeView: View {
     var body: some View {
         Group {
             if viewModel.isLoading {
-                ProgressView()
+                LoadingView(message: "Loading...")
             } else if let user = viewModel.user {
-                VStack(spacing: 16) {
-                    Text("👋 Hello, \(user.name)!")
-                        .font(.title2.bold())
-                    Text(user.email)
-                        .foregroundStyle(.secondary)
-
-                    Button("View Profile") {
-                        router.push(.profile(userId: user.id))
-                    }
-                }
+                content(user: user)
             } else if let error = viewModel.errorMessage {
                 ErrorView(message: error) {
-                    Task { await viewModel.onAppear() }
+                    Task { await viewModel.loadUser(id: "me") }
                 }
-            } else {
-                ContentUnavailableView("No data", systemImage: "person.slash")
             }
         }
+        .task { await viewModel.loadUser(id: "me") }
+    }
+
+    // MARK: - Main content
+
+    @ViewBuilder
+    private func content(user: User) -> some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                // MARK: User card
+                AppCard {
+                    VStack(spacing: 12) {
+                        Image(systemName: "person.circle.fill")
+                            .font(.system(size: 64))
+                            .foregroundStyle(theme.colors.primary)
+
+                        VStack(spacing: 4) {
+                            Text("Welcome back,")
+                                .font(theme.fonts.caption)
+                                .foregroundStyle(theme.colors.textSecondary)
+                            Text(user.name)
+                                .font(theme.fonts.heading2)
+                                .foregroundStyle(theme.colors.textPrimary)
+                            Text(user.email)
+                                .font(theme.fonts.caption)
+                                .foregroundStyle(theme.colors.textSecondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+
+                // MARK: Quick actions
+          
+
+                // MARK: Logout
+                AppButton(
+                    title: "Log Out",
+                    style: .destructive,
+                    leadingIcon: "arrow.right.square"
+                ) {
+                    router.logOut()
+                }
+            }
+            .padding(16)
+        }
+        .background(theme.colors.background.ignoresSafeArea())
         .navigationTitle("Home")
-        .task { await viewModel.onAppear() }
+        .navigationBarTitleDisplayMode(.large)
     }
 }
