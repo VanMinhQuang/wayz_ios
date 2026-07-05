@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>APIBaseURL</key>
+	<string>$(API_BASE_URL)</string>
+	<key>APITimeout</key>
+	<string>$(API_TIMEOUT)</string>
+	<key>SocketURL</key>
+	<string>$(SOCKET_URL)</string>
+	<key>MapVinaStyleURL</key>
+	<string>$(MAPVINA_STYLE_URL)</string>
+	<key>MapVinaAPIKey</key>
+	<string>$(MAPVINA_API_KEY)</string>
+	<key>DebugMenuEnabled</key>
+	<string>$(DEBUG_MENU_ENABLED)</string>
+	<key>LogLevel</key>
+	<string>$(LOG_LEVEL)</string>
+	<key>EnableMockLocation</key>
+	<string>$(ENABLE_MOCK_LOCATION)</string>
+</dict>
+</plist>

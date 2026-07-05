@@ -40,6 +40,10 @@ struct AppConfig {
 
     // MARK: API
     var apiBaseURL: URL {
+        if let urlString = Bundle.main.object(forInfoDictionaryKey: "APIBaseURL") as? String,
+           let url = URL(string: urlString.replacingOccurrences(of: "\\", with: "")) {
+            return url
+        }
         switch environment {
         case .development: return URL(string: "https://dev-api.wayz.com/v1")!
         case .staging:     return URL(string: "https://staging-api.wayz.com/v1")!
@@ -48,11 +52,26 @@ struct AppConfig {
     }
 
     var apiTimeoutInterval: TimeInterval {
+        if let timeoutString = Bundle.main.object(forInfoDictionaryKey: "APITimeout") as? String,
+           let timeout = TimeInterval(timeoutString) {
+            return timeout
+        }
+        if let timeoutInt = Bundle.main.object(forInfoDictionaryKey: "APITimeout") as? Int {
+            return TimeInterval(timeoutInt)
+        }
         switch environment {
         case .development: return 60
         case .staging:     return 30
         case .production:  return 30
         }
+    }
+
+    var socketURL: URL? {
+        guard let urlString = Bundle.main.object(forInfoDictionaryKey: "SocketURL") as? String,
+              let url = URL(string: urlString.replacingOccurrences(of: "\\", with: "")) else {
+            return nil
+        }
+        return url
     }
 
     // MARK: App Version
@@ -67,8 +86,34 @@ struct AppConfig {
     var fullVersion: String { "\(appVersion) (\(buildNumber))" }
 
     // MARK: Feature Flags
-    var isLoggingEnabled: Bool { !environment.isProduction }
-    var isMockDataEnabled: Bool { environment.isDevelopment }
+    var isLoggingEnabled: Bool {
+        if let logLevel = Bundle.main.object(forInfoDictionaryKey: "LogLevel") as? String {
+            return logLevel.lowercased() != "none"
+        }
+        return !environment.isProduction
+    }
+
+    var isMockDataEnabled: Bool {
+        if let enableMock = Bundle.main.object(forInfoDictionaryKey: "EnableMockLocation") as? String {
+            return enableMock.lowercased() == "yes" || enableMock.lowercased() == "true"
+        }
+        if let enableMock = Bundle.main.object(forInfoDictionaryKey: "EnableMockLocation") as? Bool {
+            return enableMock
+        }
+        return environment.isDevelopment
+    }
+
+    // MARK: Map (MapLibre + MapVina)
+
+    /// Injected at build time from `Config/Secrets.xcconfig` (gitignored) via
+    /// `INFOPLIST_KEY_MapVinaAPIKey = $(MAPVINA_API_KEY)`. Never hardcode this value.
+
+    /// MapVina style URL injected from xcconfig
+    var mapVinaStreetsStyleURL: URL {
+        let apiKey =  Bundle.main.object(forInfoDictionaryKey: "MapVinaAPIKey") as? String ?? "";
+
+        return URL(string: "https://maps.mapvina.com/styles/v2/streets.json?key=\(apiKey)")!
+    }
 }
 
 // MARK: - Debug Description

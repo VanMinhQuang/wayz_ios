@@ -1,0 +1,38 @@
+
+// Config-Dev.example.xcconfig
+// Template — copy to "Config-Dev.xcconfig" (same folder) and fill in real values.
+// Config-Dev.xcconfig is gitignored and must never be committed.
+
+//===== API =====
+// NOTE: xcconfig treats an unescaped "//" as a comment start — escape the
+// slashes (not the colon) or everything after "//" gets silently stripped.
+API_BASE_URL = https:\/\/YOUR_DEV_API_HOST
+API_TIMEOUT = 30
+SOCKET_URL = wss:\/\/YOUR_DEV_SOCKET_HOST
+
+//===== MapVina =====
+MAPVINA_STYLE_URL = https:\/\/YOUR_MAPVINA_STYLE_URL
+MAPVINA_API_KEY = YOUR_MAPVINA_API_KEY_HERE
+
+//===== App Identity =====
+APP_NAME = Wayz Dev
+BUNDLE_ID_SUFFIX = .dev
+PRODUCT_BUNDLE_IDENTIFIER = vn.wayz.app$(BUNDLE_ID_SUFFIX)
+
+//===== Build =====
+DEBUG_MENU_ENABLED = YES
+LOG_LEVEL = debug
+
+//===== Feature Flags =====
+ENABLE_MOCK_LOCATION = YES
+
+//===== Info.plist injection =====
+INFOPLIST_KEY_APIBaseURL = $(API_BASE_URL)
+INFOPLIST_KEY_APITimeout = $(API_TIMEOUT)
+INFOPLIST_KEY_SocketURL = $(SOCKET_URL)
+INFOPLIST_KEY_MapVinaStyleURL = $(MAPVINA_STYLE_URL)
+INFOPLIST_KEY_MapVinaAPIKey = $(MAPVINA_API_KEY)
+INFOPLIST_KEY_CFBundleDisplayName = $(APP_NAME)
+INFOPLIST_KEY_DebugMenuEnabled = $(DEBUG_MENU_ENABLED)
+INFOPLIST_KEY_LogLevel = $(LOG_LEVEL)
+INFOPLIST_KEY_EnableMockLocation = $(ENABLE_MOCK_LOCATION)

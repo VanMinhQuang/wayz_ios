@@ -10,28 +10,14 @@ struct AppNavigationStack: View {
 
     var body: some View {
         ZStack {
-            if router.isLoggedIn {
-                MainTabView()
-                .transition(
-                    .asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal:   .move(edge: .leading).combined(with: .opacity)
-                    )
+            MainTabView()
+            .transition(
+                .asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal:   .move(edge: .leading).combined(with: .opacity)
                 )
-            } else {
-                NavigationStack {
-                    LoginView(
-                        viewModel: DIContainer.shared.resolve(LoginViewModel.self),
-                        router: router
-                    )
-                }
-                .transition(
-                    .asymmetric(
-                        insertion: .move(edge: .leading).combined(with: .opacity),
-                        removal:   .move(edge: .trailing).combined(with: .opacity)
-                    )
-                )
-            }
+            )
+            
         }
         .environment(router)
         .theme(.default)
@@ -54,6 +40,7 @@ struct AppNavigationStack: View {
                 router: router
             )
         }
+        
     }
 }
 

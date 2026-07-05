@@ -28,5 +28,9 @@ final class UseCaseAssembler: Assembly {
         container.register(ProfileViewModel.self) { r in
             ProfileViewModel(getUserUseCase: r.resolve(GetUserUseCase.self)!)
         }
+
+        container.register(MapViewModel.self) { _ in
+            MapViewModel()
+        }
     }
 }
