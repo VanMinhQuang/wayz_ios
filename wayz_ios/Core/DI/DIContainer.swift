@@ -27,4 +27,13 @@ final class DIContainer {
         }
         return resolved
     }
+
+    /// Resolve a registered type whose factory takes runtime arguments,
+    /// e.g. `NavigationViewModel` (destination name/address/coordinate).
+    func resolve<T, Arg1, Arg2, Arg3>(_ type: T.Type, arguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3) -> T {
+        guard let resolved = container.resolve(type, arguments: arg1, arg2, arg3) else {
+            fatalError("❌ DIContainer: Could not resolve \(type). Did you register it in an Assembler?")
+        }
+        return resolved
+    }
 }

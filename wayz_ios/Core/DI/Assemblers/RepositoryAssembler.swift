@@ -23,5 +23,20 @@ final class RepositoryAssembler: Assembly {
                 localDataSource: r.resolve(UserLocalDataSource.self)!
             )
         }
+
+        // MARK: - Navigation / Directions
+        container.register(MapVinaDirectionsRemoteDataSource.self) { _ in
+            MapVinaDirectionsRemoteDataSource()
+        }
+
+        container.register(DirectionsRepositoryProtocol.self) { r in
+            MapVinaDirectionsRepository(remoteDataSource: r.resolve(MapVinaDirectionsRemoteDataSource.self)!)
+        }
+
+        // Shared across the map + navigation screens so location permission is
+        // only requested once and GPS updates keep flowing between the two.
+        container.register(LocationManager.self) { _ in
+            LocationManager()
+        }.inObjectScope(.container)
     }
 }

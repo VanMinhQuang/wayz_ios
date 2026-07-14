@@ -71,12 +71,27 @@ struct MapLibreMapView: UIViewRepresentable {
     /// Called when a place pin is tapped.
     var onSelectPlace: ((Places) -> Void)?
 
+    /// Shows the native "blue dot" user location puck (`MLNMapView.showsUserLocation`).
+    var showsUserLocation: Bool = false
+    /// `.none` for a static map, `.followWithHeading` for a Google-Maps-style
+    /// guided navigation camera that follows and rotates with the user.
+    var userTrackingMode: MLNUserTrackingMode = .none
+    /// Tilts the camera for a 3D "driving" perspective, used in navigation mode.
+    var navigationPitch: Double = 0
+    /// Called when the map's tracking mode changes — including when MapLibre
+    /// itself drops back to `.none` because the user panned/rotated the map
+    /// by hand. Lets the caller (e.g. a "recenter" button) know following is
+    /// no longer active.
+    var onUserTrackingModeChange: ((MLNUserTrackingMode) -> Void)?
+
     func makeUIView(context: Context) -> MLNMapView {
         let mapView = MLNMapView(frame: .zero, styleURL: styleURL)
         mapView.delegate = context.coordinator
         mapView.logoView.isHidden = true
         mapView.attributionButton.isHidden = true
         mapView.setCenter(centerCoordinate, zoomLevel: zoomLevel, animated: false)
+        mapView.showsUserLocation = showsUserLocation
+        mapView.userTrackingMode = userTrackingMode
         return mapView
     }
 
@@ -85,7 +100,21 @@ struct MapLibreMapView: UIViewRepresentable {
         context.coordinator.lineColor = lineColor
         context.coordinator.lineWidth = lineWidth
         context.coordinator.onSelectPlace = onSelectPlace
+        context.coordinator.onUserTrackingModeChange = onUserTrackingModeChange
         context.coordinator.syncPlaceAnnotations(places, on: mapView)
+
+        if mapView.showsUserLocation != showsUserLocation {
+            mapView.showsUserLocation = showsUserLocation
+        }
+        if mapView.userTrackingMode != userTrackingMode {
+            mapView.userTrackingMode = userTrackingMode
+        }
+        if navigationPitch > 0, mapView.camera.pitch != navigationPitch {
+            let camera = mapView.camera
+            camera.pitch = navigationPitch
+            mapView.setCamera(camera, animated: true)
+        }
+
         // Style may not be loaded yet on first pass; draw once it is (see delegate),
         // and redraw here on subsequent SwiftUI updates.
         if mapView.style != nil {
@@ -104,6 +133,7 @@ struct MapLibreMapView: UIViewRepresentable {
         var lineColor: UIColor = .systemBlue
         var lineWidth: Double = 4
         var onSelectPlace: ((Places) -> Void)?
+        var onUserTrackingModeChange: ((MLNUserTrackingMode) -> Void)?
 
         private var placeAnnotationsByID: [String: PlaceAnnotation] = [:]
 
@@ -116,6 +146,14 @@ struct MapLibreMapView: UIViewRepresentable {
 
         func mapView(_ mapView: MLNMapView, didFinishLoading style: MLNStyle) {
             drawRouteIfNeeded(on: mapView, forceRedraw: true)
+        }
+
+        /// Fires whenever tracking mode changes, including MapLibre's own
+        /// automatic drop to `.none` when the user drags/rotates the map by
+        /// hand — this is how we detect "user took over the camera" so a
+        /// recenter control can be shown.
+        func mapView(_ mapView: MLNMapView, didChange mode: MLNUserTrackingMode, animated: Bool) {
+            onUserTrackingModeChange?(mode)
         }
 
         // MARK: - Place pins (annotation views, so we can show a photo thumbnail)

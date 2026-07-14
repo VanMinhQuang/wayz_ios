@@ -40,29 +40,21 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		FA42D1D62FE7DE8700897DFF /* wayz_ios */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = wayz_ios;
 			sourceTree = "<group>";
 		};
 		FA42D1E42FE7DE8800897DFF /* wayz_iosTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = wayz_iosTests;
 			sourceTree = "<group>";
 		};
 		FA42D1EE2FE7DE8800897DFF /* wayz_iosUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = wayz_iosUITests;
 			sourceTree = "<group>";
 		};
 		FA88C76A2FFA548600A43CB5 /* Configs */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = Configs;
 			sourceTree = "<group>";
 		};

@@ -18,5 +18,9 @@
 	<string>$(LOG_LEVEL)</string>
 	<key>EnableMockLocation</key>
 	<string>$(ENABLE_MOCK_LOCATION)</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Wayz uses your location to show you on the map and guide turn-by-turn navigation to places you pick.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Wayz uses your location to show you on the map and guide turn-by-turn navigation to places you pick.</string>
 </dict>
 </plist>

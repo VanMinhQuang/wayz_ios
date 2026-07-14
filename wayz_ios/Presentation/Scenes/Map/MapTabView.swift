@@ -15,6 +15,12 @@ struct MapTabView: View {
     @State private var mapViewModel: MapViewModel
     @State private var isRouteVisible: Bool = false
     @State private var selectedPlace: Places?
+    /// Place the user chose to navigate to — presenting this drives the
+    /// full-screen guided navigation view (Google-Maps-style turn-by-turn).
+    @State private var navigatingPlace: Places?
+    /// "Follow my location" option set on the directions popup, carried into
+    /// `NavigationGuideView` as its starting camera mode.
+    @State private var startsFollowingUser = true
 
     /// Demo path from point A to point B. Swap in real coordinates, or a
     /// decoded polyline from a directions provider, as needed.
@@ -64,34 +70,21 @@ struct MapTabView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
 
-                // Draw path A -> B toggle
-                HStack(spacing: 8) {
-                    Button(action: { isRouteVisible.toggle() }) {
-                        Text(isRouteVisible ? "Hide Path A → B" : "Show Path A → B")
-                            .font(.system(size: 12, weight: .medium))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(
-                                isRouteVisible
-                                ? theme.colors.primary
-                                : Color(UIColor.systemBackground).opacity(0.9),
-                                in: Capsule()
-                            )
-                            .foregroundStyle(isRouteVisible ? .white : theme.colors.textPrimary)
-                    }
-                    Spacer()
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
+          
             }
 
             // MARK: Selected place card (bottom)
             if let place = selectedPlace {
                 VStack {
                     Spacer()
-                    SelectedPlaceCard(place: place) {
-                        selectedPlace = nil
-                    }
+                    SelectedPlaceCard(
+                        place: place,
+                        onClose: { selectedPlace = nil },
+                        onNavigate: { followsLocation in
+                            startsFollowingUser = followsLocation
+                            navigatingPlace = place
+                        }
+                    )
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
                 }
@@ -99,6 +92,16 @@ struct MapTabView: View {
             }
         }
         .animation(.snappy, value: selectedPlace?.id)
+        .fullScreenCover(item: $navigatingPlace) { place in
+            NavigationGuideView(
+                viewModel: DIContainer.shared.resolve(
+                    NavigationViewModel.self,
+                    arguments: place.name, place.address, place.coordinate
+                ),
+                locationManager: DIContainer.shared.resolve(LocationManager.self),
+                startsFollowingUser: startsFollowingUser
+            )
+        }
     }
 }
 
@@ -107,35 +110,70 @@ struct MapTabView: View {
 private struct SelectedPlaceCard: View {
     let place: Places
     let onClose: () -> Void
+    /// Called with the "Follow my location" choice when the user taps Directions.
+    let onNavigate: (Bool) -> Void
     @Environment(\.appTheme) private var theme
 
+    /// Whether the navigation camera should follow the user once started.
+    /// Defaults on, matching the Google-Maps-style guided navigation experience.
+    @State private var followsLocation = true
+
     var body: some View {
-        HStack(spacing: 12) {
-            AsyncImage(url: URL(string: place.images.first ?? "")) { phase in
-                if let image = phase.image {
-                    image.resizable().scaledToFill()
-                } else {
-                    Color(UIColor.systemGray4)
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                AsyncImage(url: URL(string: place.images.first ?? "")) { phase in
+                    if let image = phase.image {
+                        image.resizable().scaledToFill()
+                    } else {
+                        Color(UIColor.systemGray4)
+                    }
+                }
+                .frame(width: 56, height: 56)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(place.name)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(theme.colors.textPrimary)
+                    Text(place.address)
+                        .font(.system(size: 12))
+                        .foregroundStyle(theme.colors.textSecondary)
+                        .lineLimit(1)
+                }
+
+                Spacer()
+
+                Button(action: onClose) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
                 }
             }
-            .frame(width: 56, height: 56)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(place.name)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(theme.colors.textPrimary)
-                Text(place.address)
-                    .font(.system(size: 12))
-                    .foregroundStyle(theme.colors.textSecondary)
-                    .lineLimit(1)
+            // Option: keep the camera following the user once navigation starts.
+            Toggle(isOn: $followsLocation) {
+                HStack(spacing: 6) {
+                    Image(systemName: "location.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(theme.colors.textSecondary)
+                    Text("Follow my location")
+                        .font(.system(size: 13))
+                        .foregroundStyle(theme.colors.textSecondary)
+                }
             }
+            .toggleStyle(SwitchToggleStyle(tint: theme.colors.primary))
 
-            Spacer()
-
-            Button(action: onClose) {
-                Image(systemName: "xmark.circle.fill")
-                    .foregroundStyle(.secondary)
+            // Start guided, turn-by-turn navigation to this place (like Google Maps).
+            Button(action: { onNavigate(followsLocation) }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "location.north.fill")
+                        .font(.system(size: 13, weight: .semibold))
+                    Text("Directions")
+                        .font(.system(size: 15, weight: .semibold))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(theme.colors.primary, in: RoundedRectangle(cornerRadius: 12))
+                .foregroundStyle(.white)
             }
         }
         .padding(12)

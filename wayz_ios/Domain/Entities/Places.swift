@@ -17,7 +17,7 @@ enum PlaceType: Int{
 
 }
 
-    struct Places{
+    struct Places: Identifiable {
         let id: String;
         let name: String;
         let type: PlaceType;

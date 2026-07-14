@@ -3,6 +3,7 @@
 //  wayz_ios
 //
 
+import CoreLocation
 import Swinject
 
 final class UseCaseAssembler: Assembly {
@@ -31,6 +32,17 @@ final class UseCaseAssembler: Assembly {
 
         container.register(MapViewModel.self) { _ in
             MapViewModel()
+        }
+
+        // NavigationViewModel takes the picked destination at resolve time,
+        // e.g. `DIContainer.shared.resolve(NavigationViewModel.self, arguments: place.name, place.address, place.coordinate)`.
+        container.register(NavigationViewModel.self) { (r, name: String, address: String, coordinate: CLLocationCoordinate2D) in
+            NavigationViewModel(
+                destinationName: name,
+                destinationAddress: address,
+                destinationCoordinate: coordinate,
+                directionsRepository: r.resolve(DirectionsRepositoryProtocol.self)!
+            )
         }
     }
 }

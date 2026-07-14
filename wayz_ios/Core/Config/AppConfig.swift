@@ -108,11 +108,14 @@ struct AppConfig {
     /// Injected at build time from `Config/Secrets.xcconfig` (gitignored) via
     /// `INFOPLIST_KEY_MapVinaAPIKey = $(MAPVINA_API_KEY)`. Never hardcode this value.
 
+    /// MapVina API key injected from xcconfig (`MAPVINA_API_KEY`).
+    var mapVinaAPIKey: String {
+        Bundle.main.object(forInfoDictionaryKey: "MapVinaAPIKey") as? String ?? ""
+    }
+
     /// MapVina style URL injected from xcconfig
     var mapVinaStreetsStyleURL: URL {
-        let apiKey =  Bundle.main.object(forInfoDictionaryKey: "MapVinaAPIKey") as? String ?? "";
-
-        return URL(string: "https://maps.mapvina.com/styles/v2/streets.json?key=\(apiKey)")!
+        URL(string: "https://maps.mapvina.com/styles/v2/streets.json?key=\(mapVinaAPIKey)")!
     }
 }
 
