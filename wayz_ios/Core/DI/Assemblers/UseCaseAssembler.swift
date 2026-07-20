@@ -34,6 +34,10 @@ final class UseCaseAssembler: Assembly {
             MapViewModel()
         }
 
+        container.register(SocialTabViewModel.self) { _ in
+            SocialTabViewModel()
+        }
+
         // NavigationViewModel takes the picked destination at resolve time,
         // e.g. `DIContainer.shared.resolve(NavigationViewModel.self, arguments: place.name, place.address, place.coordinate)`.
         container.register(NavigationViewModel.self) { (r, name: String, address: String, coordinate: CLLocationCoordinate2D) in

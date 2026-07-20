@@ -26,7 +26,9 @@ struct MainTabView: View {
                 }
                 .tag(AppTab.map)
 
-            SocialTabView()
+            SocialTabView(
+                viewModel: DIContainer.shared.resolve(SocialTabViewModel.self)
+            )
                 .tabItem {
                     Label("Social", systemImage: selectedTab == .social ? "photo.fill" : "photo")
                 }
