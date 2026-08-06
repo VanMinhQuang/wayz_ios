@@ -92,6 +92,7 @@ struct MapTabView: View {
             }
         }
         .animation(.snappy, value: selectedPlace?.id)
+        .task { await mapViewModel.loadPlaces() }
         .fullScreenCover(item: $navigatingPlace) { place in
             NavigationGuideView(
                 viewModel: DIContainer.shared.resolve(
@@ -117,6 +118,10 @@ private struct SelectedPlaceCard: View {
     /// Whether the navigation camera should follow the user once started.
     /// Defaults on, matching the Google-Maps-style guided navigation experience.
     @State private var followsLocation = true
+    @State private var showSheet = false
+    /// Drives the zoom transition: the detail sheet appears to burst out of
+    /// the "Details" button rather than just sliding up from the bottom.
+    @Namespace private var detailZoomNamespace
 
     var body: some View {
         VStack(spacing: 12) {
@@ -162,19 +167,45 @@ private struct SelectedPlaceCard: View {
             }
             .toggleStyle(SwitchToggleStyle(tint: theme.colors.primary))
 
-            // Start guided, turn-by-turn navigation to this place (like Google Maps).
-            Button(action: { onNavigate(followsLocation) }) {
-                HStack(spacing: 6) {
-                    Image(systemName: "location.north.fill")
-                        .font(.system(size: 13, weight: .semibold))
-                    Text("Directions")
-                        .font(.system(size: 15, weight: .semibold))
+            // Start guided, turn-by-turn navigation to this place (like Google Maps),
+            // or open the full detail sheet.
+            HStack(spacing: 10) {
+                Button(action: { showSheet.toggle() }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "info.circle.fill")
+                            .font(.system(size: 13, weight: .semibold))
+                        Text("Details")
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(theme.colors.surface, in: RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(theme.colors.textPrimary)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(theme.colors.primary, in: RoundedRectangle(cornerRadius: 12))
-                .foregroundStyle(.white)
+                .matchedTransitionSource(id: "placeDetail", in: detailZoomNamespace)
+
+                Button(action: { onNavigate(followsLocation) }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "location.north.fill")
+                            .font(.system(size: 13, weight: .semibold))
+                        Text("Directions")
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(theme.colors.primary, in: RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(.white)
+                }
             }
+        }
+        .sheet(isPresented: $showSheet) {
+            PlaceDetailSheet(
+                place: place,
+                onNavigate: { onNavigate(followsLocation) },
+                getPlaceCommentsUseCase: DIContainer.shared.resolve(GetPlaceCommentsUseCase.self)
+            )
+            .presentationDetents([.large])
+            .navigationTransition(.zoom(sourceID: "placeDetail", in: detailZoomNamespace))
         }
         .padding(12)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))

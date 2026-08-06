@@ -6,18 +6,62 @@
 import Alamofire
 import Foundation
 
-/// Centralized endpoint definitions.
+/// Centralized endpoint definitions, mirroring API_DOCUMENTATION.md exactly.
 /// Add a new `case` here for every API endpoint in the app.
 enum APIRouter: URLRequestConvertible {
 
     // MARK: - Auth
+    case register(email: String, username: String, password: String, fullName: String)
     case login(email: String, password: String)
     case refreshToken(token: String)
 
-    // MARK: - User
-    case getUser(id: String)
-    case updateUser(id: String, body: [String: Any])
-    case deleteUser(id: String)
+    // MARK: - Users
+    case getMe
+    case updateMe(body: [String: Any])
+    case getPublicProfile(username: String)
+
+    // MARK: - Social Follows
+    case followUser(userId: String)
+    case unfollowUser(userId: String)
+    case getFollowers(userId: String)
+    case getFollowing(userId: String)
+
+    // MARK: - Places & Discovery
+    case searchPlacesNearby(lat: Double, lng: Double, radiusM: Int?, category: String?, name: String?)
+    case getPlacesByName(name: String?)
+    case createPlace(body: [String: Any])
+    case getPlaceDetail(placeId: String)
+    case getPlaceImages(placeId: String)
+
+    // MARK: - Place Reviews
+    case getPlaceReviews(placeId: String)
+    case addPlaceReview(placeId: String, rating: Int, comment: String)
+
+    // MARK: - Place Comments
+    case getPlaceComments(placeId: String)
+    case addPlaceComment(placeId: String, text: String, metaData: [String], parentId: String?)
+
+    // MARK: - Posts & Feed
+    case createPost(imageURL: String, caption: String?, placeId: String?)
+    case deletePost(postId: String)
+    case getFeed(limit: Int)
+    case getPostsByUser(userId: String, limit: Int)
+    case commentOnPost(postId: String, body: String, postRefId: String?)
+
+    // MARK: - Likes
+    case likePost(postId: String)
+    case unlikePost(postId: String)
+
+    // MARK: - Direct Messaging
+    case getConversations
+    case getMessages(conversationId: String, limit: Int)
+    case sendMessage(conversationId: String, body: String, postRefId: String?)
+
+    // MARK: - Upload Presigning
+    case presignUpload(contentType: String, folder: String)
+
+    // MARK: - Testing & Seeding
+    case seedDemoData
 
     // MARK: - Base URL
     private var baseURL: URL {
@@ -29,33 +73,110 @@ enum APIRouter: URLRequestConvertible {
     // MARK: - Path
     private var path: String {
         switch self {
-        case .login:                    return "/auth/login"
-        case .refreshToken:             return "/auth/refresh"
-        case .getUser(let id):          return "/users/\(id)"
-        case .updateUser(let id, _):    return "/users/\(id)"
-        case .deleteUser(let id):       return "/users/\(id)"
+        case .register:                        return "/auth/register"
+        case .login:                            return "/auth/login"
+        case .refreshToken:                     return "/auth/refresh"
+        case .getMe, .updateMe:                 return "/users/me"
+        case .getPublicProfile(let username):   return "/users/\(username)"
+        case .followUser(let userId), .unfollowUser(let userId):
+            return "/users/\(userId)/follow"
+        case .getFollowers(let userId):         return "/users/\(userId)/followers"
+        case .getFollowing(let userId):         return "/users/\(userId)/following"
+        case .searchPlacesNearby, .createPlace: return "/places"
+        case .getPlacesByName:                  return "/places/by_name"
+        case .getPlaceDetail(let placeId):      return "/places/\(placeId)"
+        case .getPlaceImages(let placeId):      return "/places/\(placeId)/images"
+        case .getPlaceReviews(let placeId), .addPlaceReview(let placeId, _, _):
+            return "/places/\(placeId)/reviews"
+        case .getPlaceComments(let placeId), .addPlaceComment(let placeId, _, _, _):
+            return "/places/\(placeId)/comments"
+        case .createPost:                       return "/posts"
+        case .deletePost(let postId):           return "/posts/\(postId)"
+        case .getFeed:                          return "/feed"
+        case .getPostsByUser(let userId, _):    return "/users/\(userId)/posts"
+        case .commentOnPost(let postId, _, _):  return "/posts/\(postId)/comment"
+        case .likePost(let postId), .unlikePost(let postId):
+            return "/posts/\(postId)/like"
+        case .getConversations:                 return "/conversations"
+        case .getMessages(let conversationId, _), .sendMessage(let conversationId, _, _):
+            return "/conversations/\(conversationId)/messages"
+        case .presignUpload:                    return "/uploads/presign"
+        case .seedDemoData:                     return "/seed"
         }
     }
 
     // MARK: - HTTP Method
     private var method: HTTPMethod {
         switch self {
-        case .login, .refreshToken:     return .post
-        case .getUser:                  return .get
-        case .updateUser:               return .put
-        case .deleteUser:               return .delete
+        case .register, .login, .refreshToken,
+             .followUser,
+             .createPlace, .addPlaceReview, .addPlaceComment,
+             .createPost, .commentOnPost, .likePost, .sendMessage,
+             .presignUpload, .seedDemoData:
+            return .post
+        case .updateMe:
+            return .patch
+        case .unfollowUser, .deletePost, .unlikePost:
+            return .delete
+        case .getMe, .getPublicProfile,
+             .getFollowers, .getFollowing,
+             .searchPlacesNearby, .getPlacesByName, .getPlaceDetail, .getPlaceImages,
+             .getPlaceReviews, .getPlaceComments,
+             .getFeed, .getPostsByUser,
+             .getConversations, .getMessages:
+            return .get
         }
     }
 
     // MARK: - Parameters
     private var parameters: Parameters? {
         switch self {
+        case .register(let email, let username, let password, let fullName):
+            return ["email": email, "username": username, "password": password, "full_name": fullName]
         case .login(let email, let password):
             return ["email": email, "password": password]
         case .refreshToken(let token):
             return ["refresh_token": token]
-        case .updateUser(_, let body):
+        case .updateMe(let body):
             return body
+        case .searchPlacesNearby(let lat, let lng, let radiusM, let category, let name):
+            var params: Parameters = ["lat": lat, "lng": lng]
+            if let radiusM { params["radius_m"] = radiusM }
+            if let category, !category.isEmpty { params["category"] = category }
+            if let name, !name.isEmpty { params["name"] = name }
+            return params
+        case .getPlacesByName(let name):
+            guard let name, !name.isEmpty else { return nil }
+            return ["name": name]
+        case .createPlace(let body):
+            return body
+        case .addPlaceReview(_, let rating, let comment):
+            return ["rating": rating, "comment": comment]
+        case .addPlaceComment(_, let text, let metaData, let parentId):
+            var params: Parameters = ["text": text, "meta_data": metaData]
+            params["parent_id"] = parentId
+            return params
+        case .createPost(let imageURL, let caption, let placeId):
+            var params: Parameters = ["image_url": imageURL]
+            params["caption"] = caption
+            params["place_id"] = placeId
+            return params
+        case .getFeed(let limit):
+            return ["limit": limit]
+        case .getPostsByUser(_, let limit):
+            return ["limit": limit]
+        case .commentOnPost(_, let body, let postRefId):
+            var params: Parameters = ["body": body]
+            params["post_ref_id"] = postRefId
+            return params
+        case .getMessages(_, let limit):
+            return ["limit": limit]
+        case .sendMessage(_, let body, let postRefId):
+            var params: Parameters = ["body": body]
+            params["post_ref_id"] = postRefId
+            return params
+        case .presignUpload(let contentType, let folder):
+            return ["content_type": contentType, "folder": folder]
         default:
             return nil
         }
@@ -70,7 +191,14 @@ enum APIRouter: URLRequestConvertible {
         request.timeoutInterval = 30
 
         if let params = parameters {
-            request = try JSONEncoding.default.encode(request, with: params)
+            // GET/DELETE bodies aren't sent by most servers — query-encode those,
+            // JSON-encode everything else (POST/PUT/PATCH bodies).
+            switch method {
+            case .get, .delete:
+                request = try URLEncoding.default.encode(request, with: params)
+            default:
+                request = try JSONEncoding.default.encode(request, with: params)
+            }
         }
         return request
     }

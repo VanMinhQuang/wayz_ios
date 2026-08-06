@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		036F805090691ED0E91DA5DB /* EmojiKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0E734F9FA10CAB1DBAF187A3 /* EmojiKit */; };
 		99784DAA85D0661623920273 /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = F58443DB8E2BB42F11C737E8 /* MapLibre */; };
 		FA42D26E2FE7F51F00897DFF /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = FA42D26D2FE7F51F00897DFF /* AsyncAlgorithms */; };
 		FA42D2702FE7F51F00897DFF /* AsyncStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = FA42D26F2FE7F51F00897DFF /* AsyncStreaming */; };
 		FA42D2712FE7F60000897DFF /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = FA42D2722FE7F60000897DFF /* Alamofire */; };
 		FA42D2732FE7F60000897DFF /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = FA42D2742FE7F60000897DFF /* Swinject */; };
-		036F805090691ED0E91DA5DB /* EmojiKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0E734F9FA10CAB1DBAF187A3 /* EmojiKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -616,6 +616,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		1E7065F41C433CD34745891B /* XCRemoteSwiftPackageReference "EmojiKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/danielsaidi/EmojiKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		356C493FABB55D22CC48C34D /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/maplibre/maplibre-gl-native-distribution.git";
@@ -656,17 +664,14 @@
 				minimumVersion = 1.1.4;
 			};
 		};
-		1E7065F41C433CD34745891B /* XCRemoteSwiftPackageReference "EmojiKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/danielsaidi/EmojiKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		0E734F9FA10CAB1DBAF187A3 /* EmojiKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1E7065F41C433CD34745891B /* XCRemoteSwiftPackageReference "EmojiKit" */;
+			productName = EmojiKit;
+		};
 		F58443DB8E2BB42F11C737E8 /* MapLibre */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 356C493FABB55D22CC48C34D /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
@@ -691,11 +696,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FA42D26A2FE7F3A500897DFF /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
-		};
-		0E734F9FA10CAB1DBAF187A3 /* EmojiKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 1E7065F41C433CD34745891B /* XCRemoteSwiftPackageReference "EmojiKit" */;
-			productName = EmojiKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

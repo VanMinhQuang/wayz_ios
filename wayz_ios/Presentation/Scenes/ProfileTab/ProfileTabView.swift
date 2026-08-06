@@ -7,7 +7,7 @@ import SwiftUI
 
 // MARK: - Models
 
-struct Post: Identifiable {
+struct ProfilePostTile: Identifiable {
     let id = UUID()
     let color: Color
     let emoji: String
@@ -102,7 +102,7 @@ struct ProfileTabView: View {
 
                 // Stats
                 HStack(spacing: 0) {
-                    statView(count: "\(Post.samples.count)", label: "Posts")
+                    statView(count: "\(ProfilePostTile.samples.count)", label: "Posts")
                     statView(count: "248", label: "Followers")
                     statView(count: "183", label: "Following")
                 }
@@ -257,7 +257,7 @@ struct ProfileTabView: View {
 
     private var postsGrid: some View {
         LazyVGrid(columns: columns, spacing: 2) {
-            ForEach(Post.samples) { post in
+            ForEach(ProfilePostTile.samples) { post in
                 ZStack {
                     Rectangle()
                         .fill(post.color.gradient)
@@ -285,20 +285,20 @@ struct ProfileTabView: View {
 
 // MARK: - Sample data
 
-extension Post {
-    static let samples: [Post] = [
-        Post(color: .blue,   emoji: "🗺️",  likes: 124, comments: 8),
-        Post(color: .pink,   emoji: "🌸",  likes: 89,  comments: 12),
-        Post(color: .orange, emoji: "🍜",  likes: 201, comments: 24),
-        Post(color: .green,  emoji: "🌿",  likes: 67,  comments: 5),
-        Post(color: .purple, emoji: "🎵",  likes: 143, comments: 18),
-        Post(color: .teal,   emoji: "🌊",  likes: 312, comments: 41),
-        Post(color: .red,    emoji: "❤️",  likes: 523, comments: 67),
-        Post(color: .yellow, emoji: "☀️",  likes: 98,  comments: 9),
-        Post(color: .indigo, emoji: "🌙",  likes: 176, comments: 22),
-        Post(color: .mint,   emoji: "🍃",  likes: 88,  comments: 7),
-        Post(color: .cyan,   emoji: "💧",  likes: 134, comments: 15),
-        Post(color: .brown,  emoji: "☕",  likes: 245, comments: 33)
+extension ProfilePostTile {
+    static let samples: [ProfilePostTile] = [
+        ProfilePostTile(color: .blue,   emoji: "🗺️",  likes: 124, comments: 8),
+        ProfilePostTile(color: .pink,   emoji: "🌸",  likes: 89,  comments: 12),
+        ProfilePostTile(color: .orange, emoji: "🍜",  likes: 201, comments: 24),
+        ProfilePostTile(color: .green,  emoji: "🌿",  likes: 67,  comments: 5),
+        ProfilePostTile(color: .purple, emoji: "🎵",  likes: 143, comments: 18),
+        ProfilePostTile(color: .teal,   emoji: "🌊",  likes: 312, comments: 41),
+        ProfilePostTile(color: .red,    emoji: "❤️",  likes: 523, comments: 67),
+        ProfilePostTile(color: .yellow, emoji: "☀️",  likes: 98,  comments: 9),
+        ProfilePostTile(color: .indigo, emoji: "🌙",  likes: 176, comments: 22),
+        ProfilePostTile(color: .mint,   emoji: "🍃",  likes: 88,  comments: 7),
+        ProfilePostTile(color: .cyan,   emoji: "💧",  likes: 134, comments: 15),
+        ProfilePostTile(color: .brown,  emoji: "☕",  likes: 245, comments: 33)
     ]
 }
 

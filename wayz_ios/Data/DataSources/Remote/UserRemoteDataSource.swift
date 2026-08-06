@@ -14,14 +14,34 @@ final class UserRemoteDataSource {
         self.isMock = isMock
     }
 
-    func fetchUser(id: String) async throws -> UserDTO {
-        if isMock { return try await mockFetchUser(id: id) }
-        return try await client.request(.getUser(id: id))
+    func register(email: String, username: String, password: String, fullName: String) async throws -> UserDTO {
+        if isMock { return try await mockRegister(email: email, username: username, password: password, fullName: fullName) }
+        return try await client.request(.register(email: email, username: username, password: password, fullName: fullName))
     }
 
     func login(email: String, password: String) async throws -> TokenDTO {
         if isMock { return try await mockLogin(email: email, password: password) }
         return try await client.request(.login(email: email, password: password))
+    }
+
+    func refreshToken(_ refreshToken: String) async throws -> TokenDTO {
+        if isMock { return Self.fakeToken }
+        return try await client.request(.refreshToken(token: refreshToken))
+    }
+
+    func getMe() async throws -> UserDTO {
+        if isMock { return try await mockFetchUser(id: "me") }
+        return try await client.request(.getMe)
+    }
+
+    func updateMe(body: [String: Any]) async throws -> UserDTO {
+        if isMock { return try await mockUpdateMe(body: body) }
+        return try await client.request(.updateMe(body: body))
+    }
+
+    func getPublicProfile(username: String) async throws -> UserPublicDTO {
+        if isMock { return try await mockPublicProfile(username: username) }
+        return try await client.request(.getPublicProfile(username: username))
     }
 }
 
@@ -42,24 +62,36 @@ enum MockAuthError: LocalizedError {
 // MARK: - Mock data
 
 private extension UserRemoteDataSource {
-    static let fakeUsers: [String: UserDTO] = [
+    static var fakeUsers: [String: UserDTO] = [
         "me": UserDTO(
             id: "me",
-            fullName: "Quang Van",
+            username: "quang_dev",
             email: "quang.van@hctech.com.vn",
-            avatarURL: "https://i.pravatar.cc/150?u=quang"
+            fullName: "Quang Van",
+            bio: nil,
+            avatarURL: "https://i.pravatar.cc/150?u=quang",
+            isPrivate: false,
+            createdAt: "2026-08-05T12:00:00Z"
         ),
         "u1": UserDTO(
             id: "u1",
-            fullName: "Alice Nguyen",
+            username: "alice_nguyen",
             email: "alice@wayz.com",
-            avatarURL: "https://i.pravatar.cc/150?u=alice"
+            fullName: "Alice Nguyen",
+            bio: nil,
+            avatarURL: "https://i.pravatar.cc/150?u=alice",
+            isPrivate: false,
+            createdAt: "2026-08-05T12:00:00Z"
         ),
         "u2": UserDTO(
             id: "u2",
-            fullName: "Bob Tran",
+            username: "bob_tran",
             email: "bob@wayz.com",
-            avatarURL: nil
+            fullName: "Bob Tran",
+            bio: nil,
+            avatarURL: nil,
+            isPrivate: false,
+            createdAt: "2026-08-05T12:00:00Z"
         )
     ]
 
@@ -72,8 +104,25 @@ private extension UserRemoteDataSource {
 
     static let fakeToken = TokenDTO(
         accessToken: "mock-access-token-abc123",
-        refreshToken: "mock-refresh-token-xyz789"
+        refreshToken: "mock-refresh-token-xyz789",
+        tokenType: "bearer"
     )
+
+    func mockRegister(email: String, username: String, password: String, fullName: String) async throws -> UserDTO {
+        try await Task.sleep(nanoseconds: 800_000_000)
+        let user = UserDTO(
+            id: UUID().uuidString,
+            username: username,
+            email: email,
+            fullName: fullName,
+            bio: nil,
+            avatarURL: nil,
+            isPrivate: false,
+            createdAt: "2026-08-05T12:00:00Z"
+        )
+        Self.fakeUsers[user.id] = user
+        return user
+    }
 
     func mockFetchUser(id: String) async throws -> UserDTO {
         try await Task.sleep(nanoseconds: 800_000_000)
@@ -81,6 +130,41 @@ private extension UserRemoteDataSource {
             throw MockAuthError.accountNotFound
         }
         return user
+    }
+
+    func mockUpdateMe(body: [String: Any]) async throws -> UserDTO {
+        try await Task.sleep(nanoseconds: 500_000_000)
+        guard let existing = Self.fakeUsers["me"] else {
+            throw MockAuthError.accountNotFound
+        }
+        let updated = UserDTO(
+            id: existing.id,
+            username: existing.username,
+            email: existing.email,
+            fullName: body["full_name"] as? String ?? existing.fullName,
+            bio: body["bio"] as? String ?? existing.bio,
+            avatarURL: body["avatar_url"] as? String ?? existing.avatarURL,
+            isPrivate: body["is_private"] as? Bool ?? existing.isPrivate,
+            createdAt: existing.createdAt
+        )
+        Self.fakeUsers["me"] = updated
+        return updated
+    }
+
+    func mockPublicProfile(username: String) async throws -> UserPublicDTO {
+        try await Task.sleep(nanoseconds: 500_000_000)
+        guard let user = Self.fakeUsers.values.first(where: { $0.username == username }) else {
+            throw MockAuthError.accountNotFound
+        }
+        return UserPublicDTO(
+            id: user.id,
+            username: user.username,
+            fullName: user.fullName,
+            bio: user.bio,
+            avatarURL: user.avatarURL,
+            isPrivate: user.isPrivate,
+            createdAt: user.createdAt
+        )
     }
 
     func mockLogin(email: String, password: String) async throws -> TokenDTO {
