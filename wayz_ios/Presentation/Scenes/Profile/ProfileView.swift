@@ -3,12 +3,17 @@
 //  wayz_ios
 //
 
+import SkeletonUI
 import SwiftUI
 
 struct ProfileView: View {
     @State private var viewModel: ProfileViewModel
     @Environment(\.appTheme) private var theme
     let userId: String
+
+    /// Stands in for `user` while `viewModel.isLoading`, so `content(user:)`
+    /// itself can be skeletonized instead of duplicating its layout.
+    private static let placeholderUser = User(id: "placeholder", name: "Wayz User", email: "user@example.com")
 
     init(viewModel: ProfileViewModel, userId: String) {
         self._viewModel = State(initialValue: viewModel)
@@ -17,14 +22,12 @@ struct ProfileView: View {
 
     var body: some View {
         Group {
-            if viewModel.isLoading {
-                LoadingView(message: "Loading profile...")
-            } else if let user = viewModel.user {
-                content(user: user)
-            } else if let error = viewModel.errorMessage {
+            if let error = viewModel.errorMessage {
                 ErrorView(message: error) {
                     Task { await viewModel.loadUser(id: userId) }
                 }
+            } else {
+                content(user: viewModel.user ?? Self.placeholderUser)
             }
         }
         .navigationTitle("Profile")
@@ -44,14 +47,18 @@ struct ProfileView: View {
                         Image(systemName: "person.circle.fill")
                             .font(.system(size: 72))
                             .foregroundStyle(theme.colors.primary)
+                            .skeleton(active: viewModel.isLoading)
+                            .clipShape(Circle())
 
                         VStack(spacing: 4) {
                             Text(user.name)
                                 .font(theme.fonts.heading2)
                                 .foregroundStyle(theme.colors.textPrimary)
+                                .skeleton(active: viewModel.isLoading)
                             Text(user.email)
                                 .font(theme.fonts.caption)
                                 .foregroundStyle(theme.colors.textSecondary)
+                                .skeleton(active: viewModel.isLoading)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -68,6 +75,7 @@ struct ProfileView: View {
                         )
                         .padding(.horizontal, 16)
                         .padding(.vertical, 12)
+                        .skeleton(active: viewModel.isLoading)
 
                         Divider().padding(.leading, 64)
 
@@ -79,6 +87,7 @@ struct ProfileView: View {
                         )
                         .padding(.horizontal, 16)
                         .padding(.vertical, 12)
+                        .skeleton(active: viewModel.isLoading)
                     }
                 }
 
@@ -90,6 +99,8 @@ struct ProfileView: View {
                 ) {
                     // TODO: navigate to edit profile screen
                 }
+                .disabled(viewModel.isLoading)
+                .skeleton(active: viewModel.isLoading)
             }
             .padding(16)
         }

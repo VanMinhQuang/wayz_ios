@@ -1,5 +1,5 @@
 {
-  "originHash" : "0a7cd22178c9e86c5199d25d7b359d7679b131a97384833a68c538b78379f7ee",
+  "originHash" : "defdf767cff750f121c7a05440b57f9a2027e604a7f666a058695a031d1623bb",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "84a79bc375a301169390ac110c868f06c857b83f",
         "version" : "6.27.0"
+      }
+    },
+    {
+      "identity" : "skeletonui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ErsanQ/SkeletonUI",
+      "state" : {
+        "revision" : "fb627aa59a03dc1ba21b8a1ada1bc671df0b1735",
+        "version" : "1.0.5"
       }
     },
     {

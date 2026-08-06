@@ -60,8 +60,15 @@ final class APIClient {
             default:  return .serverError(statusCode: statusCode)
             }
         }
-        if error.isSessionTaskError {
-            return .noInternetConnection
+        if let urlError = error.underlyingError as? URLError {
+            switch urlError.code {
+            case .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed:
+                return .noInternetConnection
+            case .timedOut:
+                return .timeout
+            default:
+                return .unknown(urlError)
+            }
         }
         if let underlyingError = error.underlyingError as? DecodingError {
             return .decodingFailed(underlyingError)

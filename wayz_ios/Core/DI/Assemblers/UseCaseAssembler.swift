@@ -143,7 +143,10 @@ final class UseCaseAssembler: Assembly {
         }
 
         container.register(MapViewModel.self) { r in
-            MapViewModel(getPlacesUseCase: r.resolve(GetPlacesUseCase.self)!)
+            MapViewModel(
+                getPlacesUseCase: r.resolve(GetPlacesUseCase.self)!,
+                searchNearbyPlacesUseCase: r.resolve(SearchNearbyPlacesUseCase.self)!
+            )
         }
 
         container.register(SocialTabViewModel.self) { _ in

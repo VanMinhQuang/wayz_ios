@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		036F805090691ED0E91DA5DB /* EmojiKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0E734F9FA10CAB1DBAF187A3 /* EmojiKit */; };
 		99784DAA85D0661623920273 /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = F58443DB8E2BB42F11C737E8 /* MapLibre */; };
+		CCDB9198E21DF8E027D24FAD /* SkeletonUI in Frameworks */ = {isa = PBXBuildFile; productRef = 379A95D9FAF92CD3AA919DF8 /* SkeletonUI */; };
 		FA42D26E2FE7F51F00897DFF /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = FA42D26D2FE7F51F00897DFF /* AsyncAlgorithms */; };
 		FA42D2702FE7F51F00897DFF /* AsyncStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = FA42D26F2FE7F51F00897DFF /* AsyncStreaming */; };
 		FA42D2712FE7F60000897DFF /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = FA42D2722FE7F60000897DFF /* Alamofire */; };
@@ -72,6 +73,7 @@
 				FA42D2732FE7F60000897DFF /* Swinject in Frameworks */,
 				99784DAA85D0661623920273 /* MapLibre in Frameworks */,
 				036F805090691ED0E91DA5DB /* EmojiKit in Frameworks */,
+				CCDB9198E21DF8E027D24FAD /* SkeletonUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,6 +142,7 @@
 				FA42D2742FE7F60000897DFF /* Swinject */,
 				F58443DB8E2BB42F11C737E8 /* MapLibre */,
 				0E734F9FA10CAB1DBAF187A3 /* EmojiKit */,
+				379A95D9FAF92CD3AA919DF8 /* SkeletonUI */,
 			);
 			productName = wayz_ios;
 			productReference = FA42D1D42FE7DE8700897DFF /* wayz_ios.app */;
@@ -226,6 +229,7 @@
 				FA42D26C2FE7F51F00897DFF /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				356C493FABB55D22CC48C34D /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */,
 				1E7065F41C433CD34745891B /* XCRemoteSwiftPackageReference "EmojiKit" */,
+				F999A8821819CFEDFE1DE729 /* XCRemoteSwiftPackageReference "SkeletonUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FA42D1D52FE7DE8700897DFF /* Products */;
@@ -632,6 +636,14 @@
 				minimumVersion = 6.0.0;
 			};
 		};
+		F999A8821819CFEDFE1DE729 /* XCRemoteSwiftPackageReference "SkeletonUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ErsanQ/SkeletonUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		FA42D2692FE7F39000897DFF /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
@@ -671,6 +683,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1E7065F41C433CD34745891B /* XCRemoteSwiftPackageReference "EmojiKit" */;
 			productName = EmojiKit;
+		};
+		379A95D9FAF92CD3AA919DF8 /* SkeletonUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F999A8821819CFEDFE1DE729 /* XCRemoteSwiftPackageReference "SkeletonUI" */;
+			productName = SkeletonUI;
 		};
 		F58443DB8E2BB42F11C737E8 /* MapLibre */ = {
 			isa = XCSwiftPackageProductDependency;

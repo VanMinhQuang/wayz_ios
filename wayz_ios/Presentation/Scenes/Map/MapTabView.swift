@@ -4,6 +4,8 @@
 //
 
 import CoreLocation
+import MapLibre
+import SkeletonUI
 import SwiftUI
 
 struct MapTabView: View {
@@ -13,6 +15,7 @@ struct MapTabView: View {
     private let defaultCenter = CLLocationCoordinate2D(latitude: 10.7769, longitude: 106.7009)
 
     @State private var mapViewModel: MapViewModel
+    private let locationManager = DIContainer.shared.resolve(LocationManager.self)
     @State private var isRouteVisible: Bool = false
     @State private var selectedPlace: Places?
     /// Place the user chose to navigate to — presenting this drives the
@@ -21,6 +24,10 @@ struct MapTabView: View {
     /// "Follow my location" option set on the directions popup, carried into
     /// `NavigationGuideView` as its starting camera mode.
     @State private var startsFollowingUser = true
+    /// Drives the map camera to the user's location when the "my location"
+    /// button is tapped; MapLibre animates the camera itself and drops back
+    /// to `.none` if the user pans away by hand.
+    @State private var userTrackingMode: MLNUserTrackingMode = .none
 
     /// Demo path from point A to point B. Swap in real coordinates, or a
     /// decoded polyline from a directions provider, as needed.
@@ -51,6 +58,11 @@ struct MapTabView: View {
                 places: visiblePlaces,
                 onSelectPlace: { place in
                     selectedPlace = place
+                },
+                showsUserLocation: true,
+                userTrackingMode: userTrackingMode,
+                onUserTrackingModeChange: { mode in
+                    userTrackingMode = mode
                 }
             )
             .ignoresSafeArea()
@@ -70,8 +82,33 @@ struct MapTabView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
 
-          
+                // Nearby-places skeleton, shown while loading/reloading.
+                // Pins render as MapLibre annotations rather than SwiftUI views,
+                // so there's no real place-list component to wrap here.
+                if mapViewModel.isLoading {
+                    HStack(spacing: 10) {
+                        ForEach(0..<4, id: \.self) { _ in
+                            Color.clear
+                                .frame(width: 90, height: 36)
+                                .skeleton(active: true)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 10)
+                }
             }
+
+            // MARK: My location button (bottom trailing)
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    myLocationButton
+                }
+            }
+            .padding(.trailing, 16)
+            .padding(.bottom, selectedPlace == nil ? 24 : 200)
 
             // MARK: Selected place card (bottom)
             if let place = selectedPlace {
@@ -92,16 +129,43 @@ struct MapTabView: View {
             }
         }
         .animation(.snappy, value: selectedPlace?.id)
-        .task { await mapViewModel.loadPlaces() }
+        .task {
+            locationManager.requestAuthorization()
+            await mapViewModel.loadPlaces()
+        }
         .fullScreenCover(item: $navigatingPlace) { place in
             NavigationGuideView(
                 viewModel: DIContainer.shared.resolve(
                     NavigationViewModel.self,
                     arguments: place.name, place.address, place.coordinate
                 ),
-                locationManager: DIContainer.shared.resolve(LocationManager.self),
+                locationManager: locationManager,
                 startsFollowingUser: startsFollowingUser
             )
+        }
+    }
+
+    // MARK: - My location control
+
+    private var myLocationButton: some View {
+        Button(action: recenterOnCurrentLocation) {
+            Image(systemName: "location.fill")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(theme.colors.primary)
+                .frame(width: 46, height: 46)
+                .background(.regularMaterial, in: Circle())
+                .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+        }
+    }
+
+    /// Animates the camera to the user's current location and reloads
+    /// nearby places around it.
+    private func recenterOnCurrentLocation() {
+        locationManager.startUpdating()
+        withAnimation(.snappy) { userTrackingMode = .follow }
+        Task {
+            guard let coordinate = await locationManager.awaitLocation() else { return }
+            await mapViewModel.reloadNearbyPlaces(around: coordinate)
         }
     }
 }

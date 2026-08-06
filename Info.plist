@@ -18,6 +18,11 @@
 	<string>$(LOG_LEVEL)</string>
 	<key>EnableMockLocation</key>
 	<string>$(ENABLE_MOCK_LOCATION)</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Wayz uses your location to show you on the map and guide turn-by-turn navigation to places you pick.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

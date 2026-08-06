@@ -3,6 +3,7 @@
 //  wayz_ios
 //
 
+import SkeletonUI
 import SwiftUI
 import PhotosUI
 
@@ -21,6 +22,7 @@ struct PlaceDetailSheet: View {
     /// Seeded from `place.comments` (usually empty — list/detail responses
     /// don't inline comments) and refreshed from the network in `.task`.
     @State private var comments: [Comment]
+    @State private var isLoadingComments = true
 
     @State private var draftText: String = ""
     @State private var draftImages: [Data] = []
@@ -41,6 +43,7 @@ struct PlaceDetailSheet: View {
         if let fetched = try? await getPlaceCommentsUseCase.execute(placeId: place.id) {
             comments = fetched
         }
+        isLoadingComments = false
     }
 
     private enum DetailTab: String, CaseIterable {
@@ -273,9 +276,26 @@ struct PlaceDetailSheet: View {
 
     // MARK: Comments tab
 
+    /// Stands in for a real comment while `isLoadingComments`, so the real
+    /// `commentRow` view itself can be skeletonized instead of duplicating
+    /// its layout in a separate placeholder view.
+    private static let placeholderComment = Comment(
+        id: "placeholder",
+        authorName: "Loading name",
+        authorAvatarURL: "",
+        date: "",
+        text: "Loading comment text that spans a couple of lines."
+    )
+
     private var commentsContent: some View {
         VStack(alignment: .leading, spacing: 18) {
-            if comments.isEmpty {
+            if isLoadingComments {
+                ForEach(0..<3, id: \.self) { _ in
+                    commentRow(Self.placeholderComment, isReply: false, replyTargetID: "")
+                        .skeleton(active: true)
+                        .disabled(true)
+                }
+            } else if comments.isEmpty {
                 Text("No comments yet.")
                     .font(.system(size: 14))
                     .foregroundStyle(theme.colors.textSecondary)
