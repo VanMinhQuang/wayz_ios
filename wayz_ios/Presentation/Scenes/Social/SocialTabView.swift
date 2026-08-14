@@ -176,13 +176,7 @@ private struct MomentPageView: View {
 
     private var photoCard: some View {
         ZStack {
-            AppImage(url: moment.imageURL, cornerRadius: 40, width: UIScreen.width * 0.95, height: UIScreen.height * 0.4)
-                // Never let the photo itself animate/shift — reactions animate on their own overlay.
-                .transaction { $0.animation = nil }
-                .onTapGesture(count: 2) {
-                    viewModel.sendReaction("❤️")
-                }
-
+ 
             // Sent reaction bubble — animates in AND out at the center of the photo,
             // same scale + opacity transition as the original widget reaction.
             if let reaction = viewModel.sentReaction {

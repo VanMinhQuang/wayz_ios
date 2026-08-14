@@ -152,6 +152,13 @@ final class UseCaseAssembler: Assembly {
         container.register(SocialTabViewModel.self) { _ in
             SocialTabViewModel()
         }
+        
+        container.register(ChatListViewModel.self){ _ in
+            ChatListViewModel()
+        }
+        container.register(ChatViewModel.self){_ in
+            ChatViewModel()
+        }
 
         // NavigationViewModel takes the picked destination at resolve time,
         // e.g. `DIContainer.shared.resolve(NavigationViewModel.self, arguments: place.name, place.address, place.coordinate)`.

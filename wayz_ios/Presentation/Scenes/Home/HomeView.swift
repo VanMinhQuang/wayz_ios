@@ -71,7 +71,6 @@ struct HomeView: View {
                     style: .destructive,
                     leadingIcon: "arrow.right.square"
                 ) {
-                    router.logOut()
                 }
                 .disabled(viewModel.isLoading)
                 .skeleton(active: viewModel.isLoading)

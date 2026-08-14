@@ -8,14 +8,11 @@ import SwiftUI
 struct LoginView: View {
     @State private var viewModel: LoginViewModel
     @Environment(\.appTheme) private var theme
-    private let router: AppRouter
+    @Environment(AppRouter.self) private var router
 
-    init(viewModel: LoginViewModel, router: AppRouter) {
+    init(viewModel: LoginViewModel) {
         self._viewModel = State(initialValue: viewModel)
-        self.router = router
-        viewModel.onLoginSuccess = { [weak router] in
-            router?.logIn()
-        }
+   
     }
 
     var body: some View {

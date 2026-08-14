@@ -29,9 +29,11 @@ struct AppTextField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             // Label
-            Text(label)
-                .font(theme.fonts.caption)
-                .foregroundStyle(hasError ? theme.colors.error : theme.colors.textSecondary)
+            if !label.isEmpty {
+                Text(label)
+                    .font(theme.fonts.caption)
+                    .foregroundStyle(hasError ? theme.colors.error : theme.colors.textSecondary)
+            }
 
             // Input row
             HStack(spacing: 10) {

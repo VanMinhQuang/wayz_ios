@@ -7,7 +7,7 @@ import SwiftUI
 
 enum AppTab: Int {
     case map     = 0
-    case social  = 1
+    case chat  = 1
     case profile = 2
 }
 
@@ -26,13 +26,13 @@ struct MainTabView: View {
                 }
                 .tag(AppTab.map)
 
-            SocialTabView(
-                viewModel: DIContainer.shared.resolve(SocialTabViewModel.self)
+            ChatListView(
+                viewModel: DIContainer.shared.resolve(ChatListViewModel.self)
             )
                 .tabItem {
-                    Label("Social", systemImage: selectedTab == .social ? "photo.fill" : "photo")
+                    Label("Chat", systemImage: selectedTab == .chat ? "message.fill" : "message")
                 }
-                .tag(AppTab.social)
+                .tag(AppTab.chat)
 
             ProfileTabView(router: router)
                 .tabItem {

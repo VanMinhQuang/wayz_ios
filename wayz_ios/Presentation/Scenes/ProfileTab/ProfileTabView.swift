@@ -73,7 +73,7 @@ struct ProfileTabView: View {
                     icon: "arrow.right.square.fill",
                     iconColor: .red,
                     actions: [
-                        .destructive("Log Out") { router.logOut() },
+                        .destructive("Log Out") { },
                         .ghost("Cancel") { showLogoutDialog = false }
                     ]
                 )
