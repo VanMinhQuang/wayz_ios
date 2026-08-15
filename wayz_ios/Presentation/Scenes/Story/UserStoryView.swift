@@ -130,7 +130,7 @@ struct UserStoryView: View {
 
     @ViewBuilder
     private func storyBackground(_ story: Story, isActive: Bool) -> some View {
-        switch story.mediaKind {
+        switch story.type {
         case .text:
             LinearGradient(
                 colors: gradientColors(for: story),
@@ -156,13 +156,7 @@ struct UserStoryView: View {
                 VideoPlayer(player: player).disabled(true)
             } else {
                 // Placeholder for inactive bundle — avoid instantiating multiple AVPlayers.
-                AsyncImage(url: URL(string: story.thumbnailURL ?? "")) { phase in
-                    if let image = phase.image {
-                        image.resizable().scaledToFill()
-                    } else {
-                        Color.black
-                    }
-                }
+                Color.black
             }
         }
     }
@@ -181,13 +175,13 @@ struct UserStoryView: View {
 
             Spacer()
 
-            if story.mediaKind == .text {
+            if story.type == .text {
                 centerText(story)
             }
 
             Spacer()
 
-            if let caption = story.caption, story.mediaKind != .text, !caption.isEmpty {
+            if let caption = story.textContent, story.type != .text, !caption.isEmpty {
                 Text(caption)
                     .font(theme.fonts.body)
                     .foregroundStyle(.white)
@@ -245,7 +239,7 @@ struct UserStoryView: View {
 
             Spacer()
 
-            if story.musicTrackId != nil {
+            if story.musicURL != nil {
                 Image(systemName: "music.note")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white)
@@ -266,9 +260,9 @@ struct UserStoryView: View {
     }
 
     private func centerText(_ story: Story) -> some View {
-        Text(story.caption ?? "")
+        Text(story.textContent ?? "")
             .font(.system(size: 32, weight: .bold, design: .rounded))
-            .foregroundStyle(color(fromHex: story.textColorHex) ?? .white)
+            .foregroundStyle(.white)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 32)
             .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
@@ -331,18 +325,19 @@ struct UserStoryView: View {
     private func setupCurrentStoryMedia() {
         guard let story = viewModel.currentStory else { return }
 
-        if story.mediaKind == .video, let urlString = story.mediaURL, let url = URL(string: urlString) {
+        if story.type == .video, let urlString = story.mediaURL, let url = URL(string: urlString) {
             let player = AVPlayer(url: url)
-            player.isMuted = story.mutedByDefault
+            player.isMuted = false
             player.play()
             videoPlayer = player
         }
 
-        if story.mediaKind != .video,
-           let musicURLString = Story.mockMusicURL(for: story.musicTrackId),
+        // Background music for text/image stories (video's own audio track is used for video).
+        if story.type != .video,
+           let musicURLString = story.musicURL,
            let url = URL(string: musicURLString) {
             Task {
-                await loadAudio(url: url, muted: story.mutedByDefault)
+                await loadAudio(url: url, muted: false)
             }
         }
     }
@@ -388,7 +383,9 @@ struct UserStoryView: View {
     private func startProgress() {
         progressTask?.cancel()
         guard let story = viewModel.currentStory else { return }
-        let duration = max(story.durationSeconds, 1)
+        // Default display duration — video stories overrun this until the
+        // clip finishes; text/image use the fixed 5s.
+        let duration: Double = (story.type == .video) ? 12 : 5
         let ticks = 60
 
         progressTask = Task { @MainActor in
@@ -411,7 +408,10 @@ struct UserStoryView: View {
     // MARK: - Styling helpers
 
     private func gradientColors(for story: Story) -> [Color] {
-        if let hex = story.backgroundColorHex, let base = color(fromHex: hex) {
+        // Backend's `background` field is a preset id (e.g. "gradient_sunset")
+        // or a hex string ("#FF6B6B"). If it's a valid hex, derive from that;
+        // otherwise fall back to a theme-based palette hashed by story id.
+        if let hex = story.background, let base = color(fromHex: hex) {
             return [base, base.opacity(0.75), Color.black.opacity(0.4)]
         }
         // Theme-derived fallback palettes: primary/secondary/accent gradients.

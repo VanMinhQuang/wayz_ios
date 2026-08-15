@@ -10,7 +10,6 @@ struct MessagePublicDTO: Codable {
     let conversationId: String
     let senderId: String
     let body: String
-    let postRefId: String?
     let createdAt: String
     let readAt: String?
 
@@ -19,7 +18,6 @@ struct MessagePublicDTO: Codable {
         case conversationId = "conversation_id"
         case senderId       = "sender_id"
         case body
-        case postRefId      = "post_ref_id"
         case createdAt      = "created_at"
         case readAt         = "read_at"
     }

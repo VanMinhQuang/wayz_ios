@@ -10,7 +10,6 @@ struct Message: Identifiable {
     let conversationId: String
     let senderId: String
     let body: String
-    let postRefId: String?
     let createdAt: String
     let readAt: String?
 }
@@ -18,6 +17,5 @@ struct Message: Identifiable {
 struct Conversation: Identifiable {
     let id: String
     let participantIds: [String]
-    let lastMessage: Message?
-    let updatedAt: String
+    let lastMessageAt: String?
 }

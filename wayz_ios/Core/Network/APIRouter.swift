@@ -26,6 +26,11 @@ enum APIRouter: URLRequestConvertible {
     case getFollowers(userId: String)
     case getFollowing(userId: String)
 
+    // MARK: - Block Users
+    case blockUser(userId: String)
+    case unblockUser(userId: String)
+    case getBlockedUsers
+
     // MARK: - Places & Discovery
     case searchPlacesNearby(lat: Double, lng: Double, radiusM: Int?, category: String?, name: String?)
     case getPlacesByName(name: String?)
@@ -52,10 +57,19 @@ enum APIRouter: URLRequestConvertible {
     case likePost(postId: String)
     case unlikePost(postId: String)
 
+    // MARK: - Stories
+    case createStory(body: [String: Any])
+    case deleteStory(storyId: String)
+    case getStoryTray
+    case getUserStories(userId: String)
+    case markStoryViewed(storyId: String)
+    case getStoryViewers(storyId: String)
+
     // MARK: - Direct Messaging
     case getConversations
+    case startConversation(userId: String)
     case getMessages(conversationId: String, limit: Int)
-    case sendMessage(conversationId: String, body: String, postRefId: String?)
+    case sendMessage(conversationId: String, body: String)
 
     // MARK: - Upload Presigning
     case presignUpload(contentType: String, folder: String)
@@ -82,6 +96,16 @@ enum APIRouter: URLRequestConvertible {
             return "/users/\(userId)/follow"
         case .getFollowers(let userId):         return "/users/\(userId)/followers"
         case .getFollowing(let userId):         return "/users/\(userId)/following"
+        case .blockUser(let userId), .unblockUser(let userId):
+            return "/users/\(userId)/block"
+        case .getBlockedUsers:                  return "/users/me/blocked"
+        case .createStory:                      return "/stories"
+        case .deleteStory(let storyId):         return "/stories/\(storyId)"
+        case .getStoryTray:                     return "/stories/tray"
+        case .getUserStories(let userId):       return "/users/\(userId)/stories"
+        case .markStoryViewed(let storyId):     return "/stories/\(storyId)/view"
+        case .getStoryViewers(let storyId):     return "/stories/\(storyId)/viewers"
+        case .startConversation:                return "/conversations"
         case .searchPlacesNearby, .createPlace: return "/places"
         case .getPlacesByName:                  return "/places/by_name"
         case .getPlaceDetail(let placeId):      return "/places/\(placeId)"
@@ -98,7 +122,7 @@ enum APIRouter: URLRequestConvertible {
         case .likePost(let postId), .unlikePost(let postId):
             return "/posts/\(postId)/like"
         case .getConversations:                 return "/conversations"
-        case .getMessages(let conversationId, _), .sendMessage(let conversationId, _, _):
+        case .getMessages(let conversationId, _), .sendMessage(let conversationId, _):
             return "/conversations/\(conversationId)/messages"
         case .presignUpload:                    return "/uploads/presign"
         case .seedDemoData:                     return "/seed"
@@ -109,19 +133,22 @@ enum APIRouter: URLRequestConvertible {
     private var method: HTTPMethod {
         switch self {
         case .register, .login, .refreshToken,
-             .followUser,
+             .followUser, .blockUser,
              .createPlace, .addPlaceReview, .addPlaceComment,
-             .createPost, .commentOnPost, .likePost, .sendMessage,
+             .createStory, .markStoryViewed,
+             .createPost, .commentOnPost, .likePost,
+             .startConversation, .sendMessage,
              .presignUpload, .seedDemoData:
             return .post
         case .updateMe:
             return .patch
-        case .unfollowUser, .deletePost, .unlikePost:
+        case .unfollowUser, .unblockUser, .deleteStory, .deletePost, .unlikePost:
             return .delete
         case .getMe, .getPublicProfile,
-             .getFollowers, .getFollowing,
+             .getFollowers, .getFollowing, .getBlockedUsers,
              .searchPlacesNearby, .getPlacesByName, .getPlaceDetail, .getPlaceImages,
              .getPlaceReviews, .getPlaceComments,
+             .getStoryTray, .getUserStories, .getStoryViewers,
              .getFeed, .getPostsByUser,
              .getConversations, .getMessages:
             return .get
@@ -171,10 +198,12 @@ enum APIRouter: URLRequestConvertible {
             return params
         case .getMessages(_, let limit):
             return ["limit": limit]
-        case .sendMessage(_, let body, let postRefId):
-            var params: Parameters = ["body": body]
-            params["post_ref_id"] = postRefId
-            return params
+        case .sendMessage(_, let body):
+            return ["body": body]
+        case .startConversation(let userId):
+            return ["user_id": userId]
+        case .createStory(let body):
+            return body
         case .presignUpload(let contentType, let folder):
             return ["content_type": contentType, "folder": folder]
         default:

@@ -25,4 +25,18 @@ final class SocialRemoteDataSource {
     func fetchFollowing(userId: String) async throws -> [UserPublicDTO] {
         try await client.request(.getFollowing(userId: userId))
     }
+
+    // MARK: - Blocks
+
+    func block(userId: String) async throws {
+        try await client.requestVoid(.blockUser(userId: userId))
+    }
+
+    func unblock(userId: String) async throws {
+        try await client.requestVoid(.unblockUser(userId: userId))
+    }
+
+    func fetchBlockedUsers() async throws -> [UserPublicDTO] {
+        try await client.request(.getBlockedUsers)
+    }
 }

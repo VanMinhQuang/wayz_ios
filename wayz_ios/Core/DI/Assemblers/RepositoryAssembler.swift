@@ -67,6 +67,15 @@ final class RepositoryAssembler: Assembly {
             PostsRepository(remoteDataSource: r.resolve(PostsRemoteDataSource.self)!)
         }
 
+        // MARK: - Stories
+        container.register(StoriesRemoteDataSource.self) { r in
+            StoriesRemoteDataSource(client: r.resolve(APIClient.self)!)
+        }
+
+        container.register(StoriesRepositoryProtocol.self) { r in
+            StoriesRepository(remoteDataSource: r.resolve(StoriesRemoteDataSource.self)!)
+        }
+
         // MARK: - Direct Messaging
         container.register(ConversationsRemoteDataSource.self) { r in
             ConversationsRemoteDataSource(client: r.resolve(APIClient.self)!)
