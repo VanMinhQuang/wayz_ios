@@ -14,11 +14,15 @@ final class ConversationsRemoteDataSource {
         try await client.request(.getConversations)
     }
 
+    func startConversation(userId: String) async throws -> ConversationDTO {
+        try await client.request(.startConversation(userId: userId))
+    }
+
     func fetchMessages(conversationId: String, limit: Int) async throws -> [MessagePublicDTO] {
         try await client.request(.getMessages(conversationId: conversationId, limit: limit))
     }
 
-    func sendMessage(conversationId: String, body: String, postRefId: String?) async throws -> MessagePublicDTO {
-        try await client.request(.sendMessage(conversationId: conversationId, body: body, postRefId: postRefId))
+    func sendMessage(conversationId: String, body: String) async throws -> MessagePublicDTO {
+        try await client.request(.sendMessage(conversationId: conversationId, body: body))
     }
 }

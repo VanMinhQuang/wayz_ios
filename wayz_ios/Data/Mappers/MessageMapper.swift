@@ -10,7 +10,6 @@ enum MessageMapper {
             conversationId: dto.conversationId,
             senderId: dto.senderId,
             body: dto.body,
-            postRefId: dto.postRefId,
             createdAt: dto.createdAt,
             readAt: dto.readAt
         )
@@ -22,8 +21,7 @@ enum ConversationMapper {
         Conversation(
             id: dto.id,
             participantIds: dto.participantIds,
-            lastMessage: dto.lastMessage.map { MessageMapper.toEntity($0) },
-            updatedAt: dto.updatedAt
+            lastMessageAt: dto.lastMessageAt
         )
     }
 }
