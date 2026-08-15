@@ -15,10 +15,10 @@ final class ProfileViewModel {
     var errorMessage: String?
 
     // MARK: - Dependencies
-    private let getUserUseCase: GetUserUseCase
+    private let userRepository: UserRepositoryProtocol
 
-    init(getUserUseCase: GetUserUseCase) {
-        self.getUserUseCase = getUserUseCase
+    init(userRepository: UserRepositoryProtocol) {
+        self.userRepository = userRepository
     }
 
     // MARK: - Intents
@@ -28,7 +28,7 @@ final class ProfileViewModel {
         isLoading = true
         defer { isLoading = false }
         do {
-            user = try await getUserUseCase.execute(id: id)
+            user = try await userRepository.fetchUser(id: id)
         } catch {
             errorMessage = error.localizedDescription
         }

@@ -12,7 +12,7 @@ import PhotosUI
 struct PlaceDetailSheet: View {
     let place: Places
     let onNavigate: () -> Void
-    let getPlaceCommentsUseCase: GetPlaceCommentsUseCase
+    let placesRepository: PlacesRepositoryProtocol
     @Environment(\.appTheme) private var theme
     @Environment(\.dismiss) private var dismiss
     @State private var selectedTab: DetailTab = .about
@@ -31,16 +31,16 @@ struct PlaceDetailSheet: View {
     @State private var showEmojiPicker = false
     @State private var viewerContext: ImageViewerContext?
 
-    init(place: Places, onNavigate: @escaping () -> Void, getPlaceCommentsUseCase: GetPlaceCommentsUseCase) {
+    init(place: Places, onNavigate: @escaping () -> Void, placesRepository: PlacesRepositoryProtocol) {
         self.place = place
         self.onNavigate = onNavigate
-        self.getPlaceCommentsUseCase = getPlaceCommentsUseCase
+        self.placesRepository = placesRepository
         _comments = State(initialValue: place.comments)
     }
 
     private func loadComments() async {
         // Best-effort: on failure, keep whatever `comments` already has.
-        if let fetched = try? await getPlaceCommentsUseCase.execute(placeId: place.id) {
+        if let fetched = try? await placesRepository.fetchComments(placeId: place.id) {
             comments = fetched
         }
         isLoadingComments = false

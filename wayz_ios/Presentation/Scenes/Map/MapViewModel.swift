@@ -16,19 +16,17 @@ final class MapViewModel {
     var isLoading = false
     var errorMessage: String?
 
-    private let getPlacesUseCase: GetPlacesUseCase
-    private let searchNearbyPlacesUseCase: SearchNearbyPlacesUseCase
+    private let placesRepository: PlacesRepositoryProtocol
 
-    init(getPlacesUseCase: GetPlacesUseCase, searchNearbyPlacesUseCase: SearchNearbyPlacesUseCase) {
-        self.getPlacesUseCase = getPlacesUseCase
-        self.searchNearbyPlacesUseCase = searchNearbyPlacesUseCase
+    init(placesRepository: PlacesRepositoryProtocol) {
+        self.placesRepository = placesRepository
     }
 
     func loadPlaces() async {
         isLoading = true
         errorMessage = nil
         do {
-            places = try await getPlacesUseCase.execute()
+            places = try await placesRepository.fetchPlaces(search: nil)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -41,9 +39,12 @@ final class MapViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            places = try await searchNearbyPlacesUseCase.execute(
+            places = try await placesRepository.searchNearby(
                 lat: coordinate.latitude,
-                lng: coordinate.longitude
+                lng: coordinate.longitude,
+                radiusM: nil,
+                category: nil,
+                name: nil
             )
         } catch {
             errorMessage = error.localizedDescription

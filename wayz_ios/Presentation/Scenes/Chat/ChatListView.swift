@@ -17,8 +17,8 @@ struct ChatListView: View {
     }
 
     var body: some View {
-        
-        VStack{
+
+        VStack {
             Text("Wayz Chat")
                 .font(theme.fonts.heading1)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -26,7 +26,7 @@ struct ChatListView: View {
                 .padding(.horizontal, 20)
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
-            
+
                     AppTextField(
                         label: "",
                         placeholder: "Tìm kiếm người ",
@@ -62,12 +62,17 @@ struct ChatListView: View {
             .scrollIndicators(.hidden)
             .background(theme.colors.background)
         }
-     
-
+        .requiresLogin(
+            title: "Chưa đăng nhập",
+            message: "Vui lòng đăng nhập để xem tin nhắn và trò chuyện với bạn bè."
+        )
     }
 }
 
 #Preview {
-    ChatListView(viewModel: ChatListViewModel())
+    let session = AppSession()
+    session.signIn(as: User(id: "user_me", name: "Tôi", email: "me@example.com"))
+    return ChatListView(viewModel: ChatListViewModel())
         .environment(AppRouter())
+        .environment(session)
 }

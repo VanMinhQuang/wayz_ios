@@ -34,7 +34,7 @@ struct MainTabView: View {
                 }
                 .tag(AppTab.chat)
 
-            ProfileTabView(router: router)
+            ProfileView(viewModel: DIContainer.shared.resolve(ProfileViewModel.self), userId: UserChat.mockCurrentUser.id)
                 .tabItem {
                     Label("Profile", systemImage: selectedTab == .profile ? "person.fill" : "person")
                 }

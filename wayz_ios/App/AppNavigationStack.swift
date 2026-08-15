@@ -39,8 +39,12 @@ struct AppNavigationStack: View {
             SettingsPlaceholderView()
         case .login:
             LoginView(viewModel: DIContainer.shared.resolve(LoginViewModel.self))
-        case.userChat(let chatId):
-            ChatView(viewModel: DIContainer.shared.resolve(ChatViewModel.self))
+        case .userChat(let chatId):
+            ChatView(
+                viewModel: DIContainer.shared.resolve(ChatViewModel.self, argument: chatId)
+            )
+        case .userStory(let userId):
+            UserStoryView(viewModel: DIContainer.shared.resolve(UserStoryViewModel.self, argument: userId))
         }
     }
 

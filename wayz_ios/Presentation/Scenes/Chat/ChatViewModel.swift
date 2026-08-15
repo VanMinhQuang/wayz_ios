@@ -3,15 +3,14 @@ import Observation
 
 @Observable
 final class ChatViewModel {
+    let chatId: String
     var userTo: UserChat
     var messages: [ChatContent]
 
-    init(
-        userTo: UserChat = UserChat.mockUsers[0],
-        messages: [ChatContent] = ChatContent.mockMessages
-    ) {
-        self.userTo = userTo
-        self.messages = messages
+    init(chatId: String = UserChat.mockUsers[0].id) {
+        self.chatId = chatId
+        self.userTo = UserChat.mockUser(forId: chatId) ?? UserChat.mockUsers[0]
+        self.messages = ChatContent.mockMessages
     }
 
     func sendMessage(_ text: String) {

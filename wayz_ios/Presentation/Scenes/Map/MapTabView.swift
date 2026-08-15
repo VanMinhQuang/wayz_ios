@@ -266,7 +266,7 @@ private struct SelectedPlaceCard: View {
             PlaceDetailSheet(
                 place: place,
                 onNavigate: { onNavigate(followsLocation) },
-                getPlaceCommentsUseCase: DIContainer.shared.resolve(GetPlaceCommentsUseCase.self)
+                placesRepository: DIContainer.shared.resolve(PlacesRepositoryProtocol.self)
             )
             .presentationDetents([.large])
             .navigationTransition(.zoom(sourceID: "placeDetail", in: detailZoomNamespace))

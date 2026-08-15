@@ -33,6 +33,10 @@ struct ProfileView: View {
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.loadUser(id: userId) }
+        .requiresLogin(
+            title: "Chưa đăng nhập",
+            message: "Vui lòng đăng nhập để xem hồ sơ và các tính năng cá nhân."
+        )
     }
 
     // MARK: - Main content

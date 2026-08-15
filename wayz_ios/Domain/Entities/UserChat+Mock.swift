@@ -7,28 +7,32 @@ extension UserChat {
             name: "Nguyễn Văn Minh Quang",
             avatar: "avatar_quang",
             hasNewChat: true,
-            lastMessage: "Ok anh gửi file báo cáo nhé"
+            lastMessage: "Ok anh gửi file báo cáo nhé",
+            hasStory: true
         ),
         UserChat(
             id: "user_002",
             name: "Trần Thị Lan",
             avatar: "avatar_lan",
             hasNewChat: false,
-            lastMessage: "Mai họp lúc mấy giờ vậy?"
+            lastMessage: "Mai họp lúc mấy giờ vậy?",
+            hasStory: true
         ),
         UserChat(
             id: "user_003",
             name: "Lê Hoàng Nam",
             avatar: "avatar_nam",
             hasNewChat: true,
-            lastMessage: "Đã fix xong bug rồi nha"
+            lastMessage: "Đã fix xong bug rồi nha",
+            hasStory: true
         ),
         UserChat(
             id: "user_004",
             name: "Phạm Thu Hà",
             avatar: "avatar_ha",
             hasNewChat: false,
-            lastMessage: "Cảm ơn anh nhiều!"
+            lastMessage: "Cảm ơn anh nhiều!",
+            hasStory: false
         )
     ]
 
@@ -38,8 +42,16 @@ extension UserChat {
         avatar: "avatar_me",
         hasNewChat: false,
         lastMessage: "",
+        hasStory: true,
         isMe: true
     )
+
+    /// Look up mock user by id — used to resolve a `Story.authorId`
+    /// back to its owner for display (avatar, name, etc.).
+    static func mockUser(forId id: String) -> UserChat? {
+        if mockCurrentUser.id == id { return mockCurrentUser }
+        return mockUsers.first { $0.id == id }
+    }
 }
 
 // MARK: - Mock ChatContent

@@ -17,11 +17,11 @@ final class LoginViewModel {
     var passwordError: String?
 
     // MARK: - Dependencies
-    private let loginUseCase: LoginUseCase
+    private let userRepository: UserRepositoryProtocol
     var onLoginSuccess: (() -> Void)?
 
-    init(loginUseCase: LoginUseCase) {
-        self.loginUseCase = loginUseCase
+    init(userRepository: UserRepositoryProtocol) {
+        self.userRepository = userRepository
     }
 
     // MARK: - Intents
@@ -45,7 +45,7 @@ final class LoginViewModel {
         defer { isLoading = false }
 
         do {
-            _ = try await loginUseCase.execute(email: email, password: password)
+            _ = try await userRepository.login(email: email, password: password)
             onLoginSuccess?()
         } catch {
             errorMessage = error.localizedDescription
