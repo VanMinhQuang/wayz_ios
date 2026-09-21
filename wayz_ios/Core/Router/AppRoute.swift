@@ -11,6 +11,7 @@ enum AppRoute: Hashable {
     case profile(userId: String)
     case settings
     case login
+    case register
     case userChat(chatId: String)
     case userStory(userId: String)
 }

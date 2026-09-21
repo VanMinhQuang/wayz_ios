@@ -15,6 +15,8 @@ struct PlaceDetailSheet: View {
     let placesRepository: PlacesRepositoryProtocol
     @Environment(\.appTheme) private var theme
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppSession.self) private var session
+
     @State private var selectedTab: DetailTab = .about
 
     /// Local, session-only copy of the place's comments so new comments and
@@ -577,36 +579,40 @@ struct PlaceDetailSheet: View {
             if showEmojiPicker {
                 emojiPicker
             }
+            
+            if session.isSignedIn{
+                HStack(spacing: 10) {
+                    Button(action: { showEmojiPicker.toggle() }) {
+                        Image(systemName: "face.smiling")
+                            .font(.system(size: 20))
+                            .foregroundStyle(theme.colors.textSecondary)
+                    }
 
-            HStack(spacing: 10) {
-                Button(action: { showEmojiPicker.toggle() }) {
-                    Image(systemName: "face.smiling")
-                        .font(.system(size: 20))
-                        .foregroundStyle(theme.colors.textSecondary)
+                    PhotosPicker(selection: $selectedPhotoItems, maxSelectionCount: 4, matching: .images) {
+                        Image(systemName: "photo.on.rectangle")
+                            .font(.system(size: 20))
+                            .foregroundStyle(theme.colors.textSecondary)
+                    }
+
+                    TextField("Add a comment...", text: $draftText, axis: .vertical)
+                        .font(.system(size: 14))
+                        .foregroundStyle(theme.colors.textPrimary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(theme.colors.surface, in: Capsule())
+
+                    Button(action: sendComment) {
+                        Image(systemName: "paperplane.fill")
+                            .font(.system(size: 17))
+                            .foregroundStyle(canSend ? theme.colors.primary : theme.colors.textSecondary.opacity(0.4))
+                    }
+                    .disabled(!canSend)
                 }
-
-                PhotosPicker(selection: $selectedPhotoItems, maxSelectionCount: 4, matching: .images) {
-                    Image(systemName: "photo.on.rectangle")
-                        .font(.system(size: 20))
-                        .foregroundStyle(theme.colors.textSecondary)
-                }
-
-                TextField("Add a comment...", text: $draftText, axis: .vertical)
-                    .font(.system(size: 14))
-                    .foregroundStyle(theme.colors.textPrimary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(theme.colors.surface, in: Capsule())
-
-                Button(action: sendComment) {
-                    Image(systemName: "paperplane.fill")
-                        .font(.system(size: 17))
-                        .foregroundStyle(canSend ? theme.colors.primary : theme.colors.textSecondary.opacity(0.4))
-                }
-                .disabled(!canSend)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 10)
+            
+         
         }
         .background(theme.colors.background)
         .onChange(of: selectedPhotoItems) { _, items in

@@ -121,5 +121,12 @@ final class RepositoryAssembler: Assembly {
         container.register(LocationManager.self) { _ in
             LocationManager()
         }.inObjectScope(.container)
+
+        // App-wide runtime state (currentUser, isSignedIn, …). Single instance
+        // for the whole app so any view/VM sees the same session — resolved
+        // both by SwiftUI's environment and by VMs that mutate it (e.g. login).
+        container.register(AppSession.self) { _ in
+            AppSession()
+        }.inObjectScope(.container)
     }
 }

@@ -18,7 +18,17 @@ final class UseCaseAssembler: Assembly {
         }
 
         container.register(LoginViewModel.self) { r in
-            LoginViewModel(userRepository: r.resolve(UserRepositoryProtocol.self)!)
+            LoginViewModel(
+                userRepository: r.resolve(UserRepositoryProtocol.self)!,
+                session: r.resolve(AppSession.self)!
+            )
+        }
+
+        container.register(RegisterViewModel.self) { r in
+            RegisterViewModel(
+                userRepository: r.resolve(UserRepositoryProtocol.self)!,
+                session: r.resolve(AppSession.self)!
+            )
         }
 
         container.register(ProfileViewModel.self) { r in
