@@ -94,13 +94,7 @@ struct AppConfig {
     }
 
     var isMockDataEnabled: Bool {
-        if let enableMock = Bundle.main.object(forInfoDictionaryKey: "EnableMockLocation") as? String {
-            return enableMock.lowercased() == "yes" || enableMock.lowercased() == "true"
-        }
-        if let enableMock = Bundle.main.object(forInfoDictionaryKey: "EnableMockLocation") as? Bool {
-            return enableMock
-        }
-        return environment.isDevelopment
+        return false;
     }
 
     // MARK: Map (MapLibre + MapVina)

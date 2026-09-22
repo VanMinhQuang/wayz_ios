@@ -13,6 +13,7 @@ enum APIRouter: URLRequestConvertible {
     // MARK: - Auth
     case register(email: String, username: String, password: String, fullName: String)
     case login(email: String, password: String)
+    case loginWithGoogle(idToken: String, username: String?)
     case refreshToken(token: String)
 
     // MARK: - Users
@@ -89,6 +90,7 @@ enum APIRouter: URLRequestConvertible {
         switch self {
         case .register:                        return "/auth/register"
         case .login:                            return "/auth/login"
+        case .loginWithGoogle:                  return "/auth/google"
         case .refreshToken:                     return "/auth/refresh"
         case .getMe, .updateMe:                 return "/users/me"
         case .getPublicProfile(let username):   return "/users/\(username)"
@@ -132,7 +134,7 @@ enum APIRouter: URLRequestConvertible {
     // MARK: - HTTP Method
     private var method: HTTPMethod {
         switch self {
-        case .register, .login, .refreshToken,
+        case .register, .login, .loginWithGoogle, .refreshToken,
              .followUser, .blockUser,
              .createPlace, .addPlaceReview, .addPlaceComment,
              .createStory, .markStoryViewed,
@@ -162,6 +164,8 @@ enum APIRouter: URLRequestConvertible {
             return ["email": email, "username": username, "password": password, "full_name": fullName]
         case .login(let email, let password):
             return ["email": email, "password": password]
+        case .loginWithGoogle(let idToken, let username ):
+            return ["id_token": idToken, "username": username]
         case .refreshToken(let token):
             return ["refresh_token": token]
         case .updateMe(let body):

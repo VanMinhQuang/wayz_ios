@@ -20,6 +20,7 @@ struct AppNavigationStack: View {
         .environment(router)
         .theme(.default)
         .task {
+
             if !hasSeenOnboarding {
                 router.present(.onboarding)
             }

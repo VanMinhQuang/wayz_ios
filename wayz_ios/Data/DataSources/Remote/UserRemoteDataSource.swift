@@ -24,6 +24,11 @@ final class UserRemoteDataSource {
         return try await client.request(.login(email: email, password: password))
     }
 
+    func loginWithGoogle(idToken: String, userName: String?) async throws -> TokenDTO {
+        if isMock { return Self.fakeToken }
+        return try await client.request(.loginWithGoogle(idToken: idToken, username: userName))
+    }
+
     func refreshToken(_ refreshToken: String) async throws -> TokenDTO {
         if isMock { return Self.fakeToken }
         return try await client.request(.refreshToken(token: refreshToken))

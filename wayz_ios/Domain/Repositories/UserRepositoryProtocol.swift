@@ -8,6 +8,7 @@
 protocol UserRepositoryProtocol {
     func register(email: String, username: String, password: String, fullName: String) async throws -> User
     func login(email: String, password: String) async throws -> AuthToken
+    func loginWithGoogle() async throws -> AuthToken
     func refreshToken() async throws -> AuthToken
 
     /// Pass `"me"` for the signed-in user's full profile (`GET /users/me`);

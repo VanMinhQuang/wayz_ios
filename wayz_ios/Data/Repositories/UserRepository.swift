@@ -3,13 +3,42 @@
 //  wayz_ios
 //
 
+import GoogleSignIn
+import UIKit
+
 final class UserRepository: UserRepositoryProtocol {
+
     private let remoteDataSource: UserRemoteDataSource
     private let localDataSource: UserLocalDataSource
 
     init(remoteDataSource: UserRemoteDataSource, localDataSource: UserLocalDataSource) {
         self.remoteDataSource = remoteDataSource
         self.localDataSource  = localDataSource
+    }
+
+    func loginWithGoogle() async throws -> AuthToken {
+        let rootVC = try await MainActor.run { () throws -> UIViewController in
+            guard let scene = UIApplication.shared.connectedScenes
+                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+                  let rootVC = scene.keyWindow?.rootViewController else {
+                throw GoogleAuthError.noPresentingViewController
+            }
+            return rootVC
+        }
+
+        let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootVC)
+
+        guard let idToken = result.user.idToken?.tokenString else {
+            throw GoogleAuthError.missingIdToken
+        }
+        
+        let username = result.user.profile?.name
+
+        let dto = try await remoteDataSource.loginWithGoogle(idToken: idToken, userName: username )
+        let token = TokenMapper.toEntity(dto)
+        KeychainService.shared.accessToken  = token.accessToken
+        KeychainService.shared.refreshToken = token.refreshToken
+        return token
     }
 
     func register(email: String, username: String, password: String, fullName: String) async throws -> User {
@@ -62,5 +91,17 @@ final class UserRepository: UserRepositoryProtocol {
         let entity = UserMapper.toEntity(dto)
         localDataSource.saveUser(entity)
         return entity
+    }
+}
+
+enum GoogleAuthError: LocalizedError {
+    case noPresentingViewController
+    case missingIdToken
+
+    var errorDescription: String? {
+        switch self {
+        case .noPresentingViewController: return "Unable to find a view controller to present Google Sign-In."
+        case .missingIdToken:             return "Google Sign-In succeeded but no ID token was returned."
+        }
     }
 }

@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import FirebaseCore
 
 @main
 struct wayz_iosApp: App {
@@ -11,6 +12,7 @@ struct wayz_iosApp: App {
     private let session: AppSession
 
     init() {
+        FirebaseApp.configure()
         _ = AppAssembler.shared
         // Resolve the singleton `AppSession` from DI so the SwiftUI environment
         // and any injected ViewModel share the exact same instance.

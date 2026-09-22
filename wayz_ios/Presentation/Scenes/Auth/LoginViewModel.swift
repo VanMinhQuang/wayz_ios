@@ -56,7 +56,20 @@ final class LoginViewModel {
             errorMessage = error.localizedDescription
         }
     }
+    
+    @MainActor
+    func loginGoogle() async {
+        isLoading = true
+        defer { isLoading = false }
 
+        do {
+            _ = try await userRepository.loginWithGoogle()
+            let user = try await userRepository.fetchUser(id: "me")
+            session.signIn(as: user)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
     func clearError() {
         errorMessage = nil
     }

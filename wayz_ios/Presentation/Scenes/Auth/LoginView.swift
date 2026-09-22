@@ -24,7 +24,6 @@ struct LoginView: View {
                         Image(systemName: "map.fill")
                             .font(.system(size: 48))
                             .foregroundStyle(theme.colors.primary)
-
                         Text("Welcome Back")
                             .font(theme.fonts.heading1)
                             .foregroundStyle(theme.colors.textPrimary)
@@ -58,26 +57,12 @@ struct LoginView: View {
                         )
                     }
 
-                    // MARK: Error banner
-                    if let error = viewModel.errorMessage {
-                        HStack(spacing: 8) {
-                            Text(error)
-                                .font(theme.fonts.caption)
-                                .foregroundStyle(theme.colors.error)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.vertical, 4)
-                        .padding(.horizontal, 8)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                    }
-
                     // MARK: Actions
                     VStack(spacing: 12) {
                         AppButton(
                             title: "Đăng nhập",
                             style: .primary,
                             isLoading: viewModel.isLoading,
-                            leadingIcon: "arrow.right"
                         ) {
                             Task { await viewModel.login() }
                         }
@@ -130,12 +115,17 @@ struct LoginView: View {
             }
         }
         .background(theme.colors.background.ignoresSafeArea())
-        .animation(.easeInOut(duration: 0.2), value: viewModel.errorMessage)
         .animation(.easeInOut(duration: 0.2), value: viewModel.isLoading)
-        // Login VM writes the authenticated user into `AppSession`; as soon as
-        // the session flips to signed-in we pop back to whatever screen
-        // requested login (Profile / Chat / etc.). Screens gated by
-        // `.requiresLogin()` re-render and their `.task` fires fresh loads.
+        .alert("Đăng nhập thất bại", isPresented: Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.clearError() } }
+        )) {
+            Button("OK", role: .cancel) { viewModel.clearError() }
+        } message: {
+            if let msg = viewModel.errorMessage {
+                Text(msg)
+            }
+        }
         .onChange(of: session.isSignedIn) { _, isSignedIn in
             if isSignedIn {
                 router.pop()
@@ -181,8 +171,8 @@ struct LoginView: View {
     }
 
     private func signInWithGoogle() {
-        // TODO: integrate GoogleSignIn SDK + backend OAuth endpoint.
-        // For now surface a placeholder message so the button gives feedback.
-        viewModel.errorMessage = "Đăng nhập Google chưa được hỗ trợ."
+        Task {
+            await viewModel.loginGoogle()
+        }
     }
 }
